@@ -84,9 +84,9 @@ app.post("/hello", function (req, res) {
   res.send(`Hello, ${nome}!`);
 });
 
-app.get("/clientes", async (req, res) => {
+app.get("/usuarios", async (req, res) => {
   try {
-    const clientes = await db.any("SELECT * FROM clientes;");
+    const clientes = await db.any("SELECT * FROM usuarios;");
     console.log("Retornando todos clientes.");
     res.json(clientes).status(200);
   } catch (error) {

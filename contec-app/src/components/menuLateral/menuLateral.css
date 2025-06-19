@@ -9,6 +9,31 @@
     width: 250px;
 }
 
+#dashboardbutton{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* <-- alinha o conteúdo à esquerda */
+    padding: 12px 24px;           /* reduzido para não empurrar demais */
+    width: 100%;                  /* ocupa toda a largura da coluna */
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s;
+    background: none;
+    border: none;
+    font-size: 18px;
+    text-align: left;
+    gap: 3px;
+   
+
+}
+
+#dashboardbutton:hover{
+    cursor: pointer;
+    background-color: rgba(218, 165, 32, 0.1);
+    color: #DAA520;
+
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .dashboard-container {
@@ -27,7 +52,7 @@
     }
 
     .menu-items {
-        padding: 10px 0;
+        padding: 2px 0;
     }
 
     .admin-option,
@@ -36,7 +61,7 @@
     }
 } 
 .menu-items {
-    padding: 20px 0;
+    padding: 3px 0;
 }
 
 .sidebar ul {

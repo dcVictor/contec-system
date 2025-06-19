@@ -128,7 +128,7 @@ input:focus {
 
 
 
-button {
+#butaoLogin {
     width: 100%;
     padding: 12px;
     background: linear-gradient(135deg, #DAA520, #B8860B);
@@ -143,7 +143,7 @@ button {
     font-weight: bold;
 }
 
-button:hover {
+#butaoLogin:hover {
     background: linear-gradient(135deg, #B8860B, #DAA520);
     transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);

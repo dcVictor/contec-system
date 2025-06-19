@@ -1,8 +1,8 @@
-import './register.css'
+
 import api from '../../services/api'
 import { useState } from 'react'
 
-function Cadastro({open, onFechado}) {
+function Orcamentos({open, onFechado}) {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [cracha, setCracha] = useState('')
@@ -38,7 +38,7 @@ function Cadastro({open, onFechado}) {
     <div className='container'>
       
       <form id="register" onSubmit={registerSubmit} onClick={(e) => e.stopPropagation()}>
-        <h1 id='login'><center>Cadastro de usuários</center></h1>
+        <h1 id='login'><center>Orcamentos</center></h1>
 
         <input
           placeholder="Código do crachá"
@@ -86,4 +86,4 @@ function Cadastro({open, onFechado}) {
   )
 }
 
-export default Cadastro
+export default Orcamentos

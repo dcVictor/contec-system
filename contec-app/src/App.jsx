@@ -7,6 +7,8 @@ import Cadastro from './pages/register/register.jsx'
 import Header from './components/header.jsx'
 import MenuLateral from './components/menuLateral/menuLateral.jsx'
 import Admin from './pages/dashboard/admin/admin.jsx'
+import TabelaUsuarios from './components/tables/usuarios.jsx'
+import Dashboard from './pages/dashboard/dashboard.jsx'
 
 function App(){
   return(
@@ -15,8 +17,8 @@ function App(){
         <Route path="/" element={<LayoutLogin />}></Route>
 
         <Route path='/admin' element={<Admin />}/>
-        <Route path="/" element={<Layout />}>
-        <Route path='register' element={<Cadastro />}/>
+        <Route path="/" element={<LayoutDashboard />}>
+        <Route path='dashboard' element={<Cadastro />}/>
           
         </Route>
       </Routes>
@@ -36,11 +38,20 @@ function Layout() {
   );
 }
 
+function LayoutDashboard() {
+  return (
+    <div>
+      <Dashboard />
+    </div>
+  );
+}
+
+
 function LayoutLogin() {
   return (
     <div>
       <main>
-        <Login />
+        <TabelaUsuarios />
       </main>
     </div>
   );

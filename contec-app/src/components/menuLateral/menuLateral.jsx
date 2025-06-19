@@ -1,18 +1,22 @@
 import './menuLateral.css'
+import { useState } from "react";
 
-function MenuLateral(){
+
+
+function MenuLateral( {setClientes, setHome, setRelatorios, setPedidos, setInstalacoes, setManutencoes, setOrcamentos} ){
+
     return(
        <div>
         <nav class="sidebar">
             <div class="menu-items">
                 <ul>
-                    <li><a href="#home"><i class="fas fa-solid fa-house menu-icon"></i>Home</a></li>
-                    <li><a href="#relatorios"><i class="fas fa-chart-bar menu-icon"></i>Relatórios</a></li>
-                    <li><a href="#instalacoes"><i class="fas fa-hard-hat menu-icon"></i>Instalações</a></li>
-                    <li><a href="#manutencoes"><i class="fas fa-tools menu-icon"></i>Manutenções</a></li>
-                    <li><a href="#pedidos"><i class="fas fa-clipboard-list menu-icon"></i>Pedidos</a></li>
-                    <li><a href="#orcamentos"><i class="fas fa-file-invoice-dollar menu-icon"></i>Orçamentos</a></li>
-                    <li><a href="#clientes"><i class="fas fa-users menu-icon"></i>Clientes</a></li>
+                    <li><button id="dashboardbutton" onClick={() => setHome(true)}><i class="fas fa-solid fa-house menu-icon"></i>Home</button></li>
+                    <li><button id="dashboardbutton" onClick={() => setRelatorios(true)}><i class="fas fa-chart-bar menu-icon"></i>Relatórios</button></li>
+                    <li><button id="dashboardbutton" onClick={() => setPedidos(true)}><i class="fas fa-clipboard-list menu-icon"></i>Pedidos</button></li>
+                    <li><button id="dashboardbutton" onClick={() => setInstalacoes(true)}><i class="fas fa-hard-hat menu-icon"></i>Instalações</button></li>
+                    <li><button id="dashboardbutton" onClick={() => setManutencoes(true)}><i class="fas fa-tools menu-icon"></i>Manutenções</button></li>
+                    <li><button id="dashboardbutton" onClick={() => setOrcamentos(true)}><i class="fas fa-file-invoice-dollar menu-icon"></i>Orçamentos</button></li>
+                    <li><button id="dashboardbutton" onClick={() => setClientes(true)}> <i class="fas fa-users menu-icon"></i>Clientes</button></li>
                 </ul>
             </div>
             <div class="bottom-menu">

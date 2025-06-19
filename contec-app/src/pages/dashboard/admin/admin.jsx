@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import Cadastro from '../../register/register';
+import TabelaUsuarios from '../../../components/tables/usuarios';
 import './admin.css';
+
+
 
 function Admin(){
     const [taAberto, portao] = useState(false);
@@ -9,31 +12,31 @@ function Admin(){
         
         <div className='layout-container'>
         <header>
-            <div class="logo-wrapper">
-                <div class="logo-square"></div>
-                <div class="logo-text">CONTEC</div>
+            <div className="logo-wrapper">
+                <div className="logo-square"></div>
+                <div className="logo-text">CONTEC</div>
             </div>
-            <div class="page-title">Administração de Usuários</div>
+            <div className="page-title">Administração de Usuários</div>
         </header>
     
 
-            <div class="layout-content-container">
+            <div className="layout-content-container">
     
       
     
-        <nav class="sidebar">
-            <div class="menu-items">
+        <nav className="sidebar">
+            <div className="menu-items">
                 <ul>
-                    <li><a href="/register"><i class="fas fa-arrow-left menu-icon"></i>Voltar</a></li>
+                    <li><a href="/dashboard"><i className="fas fa-arrow-left menu-icon"></i>Voltar</a></li>
                 </ul>
             </div>
         </nav>
 
  
-        <main class="content">
-            <div class="admin-actions">
-                <button id="addUserBtn" class="action-button" onClick={() => portao(true)}>
-                    <i class="fas fa-user-plus"></i> Novo Usuário
+        <main className="content">
+            <div className="admin-actions">
+                <button id="addUserBtn" className="action-button" onClick={() => portao(true)}>
+                    <i className="fas fa-user-plus"></i> Novo Usuário
                 </button>
                
 
@@ -41,10 +44,10 @@ function Admin(){
             </div>
 
             <Cadastro open={taAberto} onFechado={() => portao(false)} />
-
-            <div class="dashboard-content">
-                <div class="users-table-container">
-                    <table class="users-table">
+           
+            <div className="dashboard-content">
+                <div className="users-table-container">
+                    <table className="users-table">
                         <thead>
                             <tr>
                                 <th>Usuário</th>
@@ -55,9 +58,12 @@ function Admin(){
                             </tr>
                         </thead>
                         <tbody id="usersTableBody">
+                          
                         
                         </tbody>
+                       
                     </table>
+                      <TabelaUsuarios />
                 </div>
             </div>
         </main>

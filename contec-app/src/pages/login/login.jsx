@@ -66,7 +66,7 @@ function Login() {
             />
  
           </div>
-          <button type="submit">Entrar</button>
+          <button id='butaoLogin' type="submit">Entrar</button>
         </form>
       </div>
     </div>

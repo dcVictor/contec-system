@@ -1,8 +1,8 @@
-import './register.css'
+
 import api from '../../services/api'
 import { useState } from 'react'
 
-function Cadastro({open, onFechado}) {
+function Pedidos({open, onFechado}) {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [cracha, setCracha] = useState('')
@@ -34,11 +34,11 @@ function Cadastro({open, onFechado}) {
   if(!open) return null;
   return (
 
-    <div onClick={onFechado} className='escuridao' >
-    <div className='container'>
+    <div onClick={onFechado} className='container-pedidos' >
+    <div className='container-content-pedidos'>
       
-      <form id="register" onSubmit={registerSubmit} onClick={(e) => e.stopPropagation()}>
-        <h1 id='login'><center>Cadastro de usuários</center></h1>
+      <form id="pedidos-form" onSubmit={registerSubmit} onClick={(e) => e.stopPropagation()}>
+        <h1 id='login'><center>Pedidos</center></h1>
 
         <input
           placeholder="Código do crachá"
@@ -86,4 +86,4 @@ function Cadastro({open, onFechado}) {
   )
 }
 
-export default Cadastro
+export default Pedidos
