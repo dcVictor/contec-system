@@ -76,42 +76,42 @@ function ContatosClientes( { contatosClientes, carregarClientes }) {
 
       
 
-   {
-  field: "actions",
-  headerName: "Ações",
-  flex: 0.4,
-  sortable: false,
-  filterable: false,
-  disableColumnMenu: true,
-  renderCell: (params) => {
-    const handleEdit = () => {
-      console.log("Editar usuário:", params.row);
-      setIdUsuarioSelecionado(params.row.cpf);
-      portao(true)
-    };
+//    {
+//   field: "actions",
+//   headerName: "Ações",
+//   flex: 0.4,
+//   sortable: false,
+//   filterable: false,
+//   disableColumnMenu: true,
+//   renderCell: (params) => {
+//     const handleEdit = () => {
+//       console.log("Editar usuário:", params.row);
+//       setIdUsuarioSelecionado(params.row.cpf);
+//       portao(true)
+//     };
 
 
 
-    return (
-      <Box display="flex" gap="10px" marginTop="13px">
-        <button
-          onClick={handleEdit}
-          style={{
-            background: "#DAA520",
-            color: "#1a1a1a",
-            border: "none",
-            padding: "4px 8px",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Editar
-        </button>
+//     return (
+//       <Box display="flex" gap="10px" marginTop="13px">
+//         <button
+//           onClick={handleEdit}
+//           style={{
+//             background: "#DAA520",
+//             color: "#1a1a1a",
+//             border: "none",
+//             padding: "4px 8px",
+//             borderRadius: "4px",
+//             cursor: "pointer",
+//           }}
+//         >
+//           Editar
+//         </button>
     
-      </Box>
-    );
-  }
-}
+//       </Box>
+//     );
+//   }
+// }
   ]
 
 

@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
-import React from 'react'
+import { useState } from 'react';
 import '../../styles/usuarios.css'
 import api from '../../services/api'
-import { mockDataTeam } from '../../data/mockData';
 import { DataGrid } from '@mui/x-data-grid'
 import { Box } from '@mui/material';
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import ConstructionOutlinedIcon from '@mui/icons-material/ConstructionOutlined';
 import { ptBR } from '@mui/x-data-grid/locales'; 
