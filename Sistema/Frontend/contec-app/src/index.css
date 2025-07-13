@@ -1,0 +1,44 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+
+.layout-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-content-container{
+  display: flex;
+  width: 100%;
+}
+
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  font-family: 'Poppins', sans-serif;
+}
+
+
+body{
+  min-height: 100vh;
+  width: 100vw;
+ background-color: #1a1a1a;
+
+}
+ 

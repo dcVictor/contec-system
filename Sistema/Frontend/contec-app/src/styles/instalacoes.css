@@ -1,0 +1,19 @@
+/* Cor de fundo e texto dos botões */
+.fc-header-toolbar .fc-button {
+  background-color: #DAA520;  /* dourado */
+  color: #222222;             /* texto escuro */
+  border: none;
+  box-shadow: none;
+}
+
+/* Cor quando o botão está ativo */
+.fc-header-toolbar .fc-button.fc-button-active {
+  background-color: #b8860b; /* dourado mais escuro */
+  color: white;
+}
+
+/* Cor ao passar o mouse */
+.fc-header-toolbar .fc-button:hover {
+  background-color: #ffca28; /* dourado claro */
+  color: black;
+}

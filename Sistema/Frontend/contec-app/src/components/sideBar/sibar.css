@@ -1,0 +1,31 @@
+.sidebar {
+  width: 250px;
+  transition: width 0.3s;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar .menu-items ul li a,
+.sidebar .bottom-menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  white-space: nowrap;
+}
+
+.sidebar .menu-icon {
+  margin-right: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  padding: 10px;
+  text-align: right;
+  color: white;
+  font-size: 1.2rem;
+}

@@ -1,0 +1,96 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: small;
+}
+
+.container_budgets {
+    padding: 20px;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-weight: bold;
+
+}
+
+.budgets_form{
+    flex-direction: column;
+    color: white;
+    width: 100%;
+    font-size: 15px;
+    padding: 5px;
+    
+
+}
+
+
+.content_email_budgets{
+    margin-left: 6px;
+      font-size: 15px;
+
+}
+.namecontact_budgets{
+    display: flex;
+}
+
+.radioinput_budgets{
+    display: flex;
+    font-size: 15px;
+    align-items: center;
+    margin-top: 3px;
+    width: 500px;
+    justify-content: center;
+    margin-left: 26%;
+    gap: 10px;
+}
+
+ 
+#submitbudget_button{
+    width: 60%;
+    padding: 12px;
+    background: linear-gradient(135deg, #DAA520, #B8860B);
+    color: rgb(34, 34, 34);
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-left: 20%;
+    margin-top: 14px;
+}
+
+#submitbudget_button:hover {
+    background: linear-gradient(135deg, #B8860B, #DAA520);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);
+}
+
+.contentname_budgets{
+    margin-top: 18px;
+    width: 100%;
+    font-size: 15px;
+    color: white;
+    padding: 5px
+
+}
+
+.contentmedidas_budgets{
+
+    width: 100%;
+    font-size: 15px;
+    color: white;
+    padding: 5px
+}
+#txt_budgets{
+    color: rgb(255, 255, 255);
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+
+}
