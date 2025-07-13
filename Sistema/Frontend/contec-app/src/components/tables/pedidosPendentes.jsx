@@ -123,10 +123,11 @@ function PedidosPendentes( { open, onFechado, pedidosPendentes, carregarPedidos 
         const id = params.row.codped;
         api.put(`/pedido/update/${id}`, {
           statped: 'pedido',
-        }).then(() => {
+        })
           carregarPedidos();
           alert("Pedido atualizado com sucesso!");
-        });
+          carregarPedidos();
+      
       };
 
       return (
