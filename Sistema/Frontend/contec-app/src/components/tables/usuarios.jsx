@@ -12,16 +12,23 @@ import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import ConstructionOutlinedIcon from '@mui/icons-material/ConstructionOutlined';
 import { ptBR } from '@mui/x-data-grid/locales'; 
 import AtualizarUsuario from '../updateUser/updateUser';
+import { useAuth } from '../../context/authContext';
+import { Navigate } from 'react-router-dom';
 
 
 function TabelaUsuarios( { usuarios, carregarUsuarios }) {
     const [taAberto, portao] = useState(false);
     const [idUsuarioSelecionado, setIdUsuarioSelecionado] = useState(null);
+    const { usuario } = useAuth();
+
+    if (usuario.cargo !== "adm" && usuario.cargo !== "Administrador") {
+    return <Navigate to="/" replace />;
+    }
 
 
 
 
-  const columns = [
+  let columns = [
     {field: "codusuario", headerName: "ID"},
 
     {
@@ -70,8 +77,10 @@ function TabelaUsuarios( { usuarios, carregarUsuarios }) {
         )
       }
     },
+  ]
 
-   {
+  if (usuario?.cargo === "adm" || usuario?.cargo === "Administrador" )
+  columns.push({
   field: "actions",
   headerName: "Ações",
   flex: 1,
@@ -97,7 +106,7 @@ function TabelaUsuarios( { usuarios, carregarUsuarios }) {
         alert("Erro ao excluir usuário.");
       });
   }
-};
+}; 
 
     return (
       <Box display="flex" gap="10px" marginTop="13px">
@@ -131,20 +140,7 @@ function TabelaUsuarios( { usuarios, carregarUsuarios }) {
     );
   }
 }
-  ]
-
-
-  // const carregarUsuarios = () => {
-  //   api.get('/usuarios')
-  //     .then(res => setUsuarios(res.data))
-  //     .catch(err => console.error('Erro ao buscar usuários:', err));
-  // };
-
-  // useEffect(() => {
-  //   carregarUsuarios(); // primeira chamada
-  // }, []);
-
-
+)
 
   return (
           <Box m="20px">

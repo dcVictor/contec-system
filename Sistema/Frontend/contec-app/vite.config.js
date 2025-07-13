@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 1234,  // definir a porta para 808
+   
     
   }
 })
