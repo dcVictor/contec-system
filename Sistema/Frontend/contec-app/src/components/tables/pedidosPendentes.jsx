@@ -15,15 +15,21 @@ import AtualizarUsuario from '../updateUser/updateUser';
 import HourglassBottomOutlinedIcon from '@mui/icons-material/HourglassBottomOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FactoryOutlinedIcon from '@mui/icons-material/FactoryOutlined';
+import AtualizarPedido from '../updateOrder/updateOrder';
+import { useAuth } from "../../context/authContext"
 
 
-function PedidosPendentes( { pedidosPendentes, carregarPedidos }) {
+
+function PedidosPendentes( { open, onFechado, pedidosPendentes, carregarPedidos }) {
     const [taAberto, portao] = useState(false);
     const [idUsuarioSelecionado, setIdUsuarioSelecionado] = useState(null);
+    const [valorPedido, setValorPedidoSelecionado] = useState(null);
+    const { usuario } = useAuth();
 
 
 
-  const columns = [
+
+ let columns = [
     {field: "codped", headerName: "ID", flex: 0.2},
 
 
@@ -45,16 +51,11 @@ function PedidosPendentes( { pedidosPendentes, carregarPedidos }) {
       flex: 0.1,
     },
 
-      {
-      field: "tipo_portao", 
-      headerName: "Modelo do portão",
-      flex: 0.6,
-    },
-
+   
        {
       field: "statped", 
       headerName: "Status do pedido",
-      flex: 0.7,
+      flex: 0.8,
       renderCell: ({ row }) =>{
 
         const cargo = row.statped;
@@ -87,98 +88,95 @@ function PedidosPendentes( { pedidosPendentes, carregarPedidos }) {
     {field: "valped", headerName: "Valor", flex: 0.5},
   
 
-
-
-   {
-  field: "actions",
-  headerName: "Ações",
-  flex: 1,
-  sortable: false,
-  filterable: false,
-  disableColumnMenu: true,
-  renderCell: (params) => {
-  const handleEdit = () => {
-    console.log("Editar pedido:", params.row);
-    setIdUsuarioSelecionado(params.row.codped);
-    portao(true);
-  };
-
-  const handleDelete = () => {
-    const id = params.row.codped;
-    if (window.confirm("Tem certeza que deseja excluir este pedido?")) {
-      api.delete(`/pedido/delete/${id}`)
-        .then(() => {
-          if (carregarPedidos) carregarPedidos();
-        })
-        .catch((err) => {
-          console.error("Erro ao excluir pedido:", err);
-          alert("Erro ao excluir pedido.");
-        });
-    }
-  };
-
-  const handleUpdate = async () => {
-    const id = params.row.codped;
-    try {
-      const response = await api.put(`/pedido/updatecerto`, {
-        statped: 'pedido',
-      });
-      if (carregarPedidos) carregarPedidos();
-      alert("Pedido atualizado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao atualizar pedido:", error);
-    }
-  };
-
-  // ✅ Retorno dos botões (estava fora!)
-  return (
-    <Box display="flex" gap="10px" marginTop="13px">
-      <button
-        onClick={handleUpdate}
-        style={{
-          background: "green",
-          color: "white",
-          border: "none",
-          padding: "4px 8px",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
-        Confirmar
-      </button>
-      <button
-        onClick={handleEdit}
-        style={{
-          background: "#DAA520",
-          color: "#1a1a1a",
-          border: "none",
-          padding: "4px 8px",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
-        Editar
-      </button>
-      <button
-        onClick={handleDelete}
-        style={{
-          background: "#8B0000",
-          color: "white",
-          border: "none",
-          padding: "4px 8px",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
-        Excluir
-      </button>
-    </Box>
-  );
-}
-}
-
   ]
 
+  if (usuario?.cargo === "adm" || usuario?.cargo === "Administrador" ) {
+  columns.push({
+    field: "actions",
+    headerName: "Ações",
+    flex: 1.5,
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => {
+      const handleEdit = () => {
+        setIdUsuarioSelecionado(params.row.codped);
+        setValorPedidoSelecionado(params.row.valped);
+        portao(true);
+      };
+
+      const handleDelete = () => {
+        const id = params.row.codped;
+        if (window.confirm("Tem certeza que deseja excluir este pedido?")) {
+          api.delete(`/pedido/delete/${id}`)
+            .then(() => {
+              if (carregarPedidos) carregarPedidos();
+            })
+            .catch((err) => {
+              console.error("Erro ao excluir pedido:", err);
+              alert("Erro ao excluir pedido.");
+            });
+        }
+      };
+
+      const handleUpdate = () => {
+        const id = params.row.codped;
+        api.put(`/pedido/update/${id}`, {
+          statped: 'pedido',
+        }).then(() => {
+          carregarPedidos();
+          alert("Pedido atualizado com sucesso!");
+        });
+      };
+
+      return (
+        <Box display="flex" gap="10px" marginTop="13px">
+          <button
+            onClick={handleUpdate}
+            style={{
+              background: "green",
+              color: "white",
+              border: "none",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Confirmar
+          </button>
+          <button
+            onClick={handleEdit}
+            style={{
+              background: "#DAA520",
+              color: "#1a1a1a",
+              border: "none",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Editar
+          </button>
+          <button
+            onClick={handleDelete}
+            style={{
+              background: "#8B0000",
+              color: "white",
+              border: "none",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Cancelar
+          </button>
+        </Box>
+      );
+    }
+  });
+}
+
+if(!open) return null;
   return (
           <Box m="20px">
             <Box m="40px 0 0 0" height="75vh"
@@ -239,6 +237,7 @@ function PedidosPendentes( { pedidosPendentes, carregarPedidos }) {
              
       >
               
+               <AtualizarPedido open={taAberto} onFechado={() => portao(false)} id={idUsuarioSelecionado} carregarPedidos={carregarPedidos} />
 
               <DataGrid rows={pedidosPendentes} columns={columns} localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
               getRowId={(row) => row.codped}

@@ -321,45 +321,29 @@ export const mockTransactions = [
 export const mockBarData = [
   {
     Serviços: "Janeiro",
-    "Seccionados": 137,
-    Enrolar: 96,
-    Manutenções: 72,
-   
+    Pedidos: 96,
   },
   {
     Serviços: "Fevereiro",
-    "Seccionados": 55,
-    "SeccionadosColor": "hsl(307, 70%, 50%)",
-    Enrolar: 28,
-    EnrolarColor: "hsl(111, 70%, 50%)",
-    Manutenções: 58,
+    Pedidos: 28,
+   
   },
   {
     Serviços: "Março",
-    "Seccionados": 109,
-    "SeccionadosColor": "hsl(72, 70%, 50%)",
-    Enrolar: 23,
-    EnrolarColor: "hsl(96, 70%, 50%)",
-    Manutenções: 34,
-    ManutençõesColor: "hsl(106, 70%, 50%)",
-
+    Pedidos: 23,
   },
   {
     Serviços: "Abril",
-    "Seccionados": 133,
-    "SeccionadosColor": "hsl(257, 70%, 50%)",
-    Enrolar: 52,
-    EnrolarColor: "hsl(326, 70%, 50%)",
-    Manutenções: 43,
-    ManutençõesColor: "hsl(110, 70%, 50%)",
+    Pedidos: 52,
+
 
   },
   {
     Serviços: "Maio",
     "Seccionados": 81,
     "SeccionadosColor": "hsl(190, 70%, 50%)",
-    Enrolar: 80,
-    EnrolarColor: "hsl(325, 70%, 50%)",
+    Pedidos: 80,
+    PedidosColor: "hsl(325, 70%, 50%)",
     Manutenções: 112,
     ManutençõesColor: "hsl(54, 70%, 50%)",
  
@@ -368,8 +352,8 @@ export const mockBarData = [
     Serviços: "Junho",
     "Seccionados": 66,
     "SeccionadosColor": "hsl(208, 70%, 50%)",
-    Enrolar: 111,
-    EnrolarColor: "hsl(334, 70%, 50%)",
+    Pedidos: 111,
+    PedidosColor: "hsl(334, 70%, 50%)",
     Manutenções: 167,
     ManutençõesColor: "hsl(182, 70%, 50%)",
    
@@ -378,8 +362,8 @@ export const mockBarData = [
     Serviços: "Julho",
     "Seccionados": 80,
     "SeccionadosColor": "hsl(87, 70%, 50%)",
-    Enrolar: 47,
-    EnrolarColor: "hsl(141, 70%, 50%)",
+    Pedidos: 47,
+    PedidosColor: "hsl(141, 70%, 50%)",
     Manutenções: 158,
     ManutençõesColor: "hsl(224, 70%, 50%)",
    
@@ -388,8 +372,8 @@ export const mockBarData = [
     Serviços: "Agosto",
     "Seccionados": 80,
     "SeccionadosColor": "hsl(87, 70%, 50%)",
-    Enrolar: 47,
-    EnrolarColor: "hsl(141, 70%, 50%)",
+    Pedidos: 47,
+    PedidosColor: "hsl(141, 70%, 50%)",
     Manutenções: 158,
     ManutençõesColor: "hsl(224, 70%, 50%)",
     
@@ -398,8 +382,8 @@ export const mockBarData = [
     Serviços: "Setembro",
     "Seccionados": 170,
     "SeccionadosColor": "hsl(87, 70%, 50%)",
-    Enrolar: 47,
-    EnrolarColor: "hsl(141, 70%, 50%)",
+    Pedidos: 47,
+    PedidosColor: "hsl(141, 70%, 50%)",
     Manutenções: 158,
     ManutençõesColor: "hsl(224, 70%, 50%)",
   
@@ -408,8 +392,8 @@ export const mockBarData = [
     Serviços: "Outubro",
     "Seccionados": 80,
     "SeccionadosColor": "hsl(87, 70%, 50%)",
-    Enrolar: 47,
-    EnrolarColor: "hsl(141, 70%, 50%)",
+    Pedidos: 47,
+    PedidosColor: "hsl(141, 70%, 50%)",
     Manutenções: 158,
     ManutençõesColor: "hsl(224, 70%, 50%)",
    
@@ -418,8 +402,8 @@ export const mockBarData = [
     Serviços: "Novembro",
     "Seccionados": 80,
     "SeccionadosColor": "hsl(87, 70%, 50%)",
-    Enrolar: 47,
-    EnrolarColor: "hsl(141, 70%, 50%)",
+    Pedidos: 47,
+    PedidosColor: "hsl(141, 70%, 50%)",
     Manutenções: 158,
     ManutençõesColor: "hsl(224, 70%, 50%)",
   
@@ -428,8 +412,8 @@ export const mockBarData = [
     Serviços: "Dezembro",
     "Seccionados": 80,
     "SeccionadosColor": "hsl(87, 70%, 50%)",
-    Enrolar: 47,
-    EnrolarColor: "hsl(141, 70%, 50%)",
+    Pedidos: 47,
+    PedidosColor: "hsl(141, 70%, 50%)",
     Manutenções: 158,
     ManutençõesColor: "hsl(224, 70%, 50%)",
 
@@ -438,22 +422,15 @@ export const mockBarData = [
 
 export const mockPieData = [
   {
-    id: "Portões Seccionados",
-    label: "Total Portões Seccionados",
-    value: 239,
-    color: "hsl(43, 84.60%, 48.20%)",
-  },
-  {
-    id: "Portões de Enrolar",
-    label: "Total portões de Enrolar",
+    id: "Pedidos",
+    label: "Total pedidos vendidos",
     value: 170,
-    color: "hsl(66, 92.10%, 55.10%)",
   },
   {
     id: "Manutenções",
     label: "Manutenções",
     value: 322,
-    color: "hsl(47, 85.40%, 51.60%)",
+
   },
  
 ];

@@ -30,7 +30,7 @@ export const login = (req, res, next) => {
       { expiresIn: '20h' }
     );
     // Retorna o token para o front
-    return res.json({ token, user: { nome: user.nome } });
+    return res.json({ token, user: { nome: user.nome, cargo: user.cargo} });
   })(req, res, next);
 };
 

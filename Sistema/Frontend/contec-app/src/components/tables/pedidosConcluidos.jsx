@@ -15,9 +15,10 @@ import AtualizarUsuario from '../updateUser/updateUser';
 import HourglassBottomOutlinedIcon from '@mui/icons-material/HourglassBottomOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FactoryOutlinedIcon from '@mui/icons-material/FactoryOutlined';
+import AtualizarPedido from '../updateOrder/updateOrder';
 
 
-function PedidosConcluidos( { pedidosConcluidos, carregarPedidos }) {
+function PedidosConcluidos( { open, onFechado, pedidosConcluidos, carregarPedidos }) {
     const [taAberto, portao] = useState(false);
     const [idUsuarioSelecionado, setIdUsuarioSelecionado] = useState(null);
 
@@ -47,11 +48,7 @@ function PedidosConcluidos( { pedidosConcluidos, carregarPedidos }) {
       flex: 0.1,
     },
 
-      {
-      field: "tipo_portao", 
-      headerName: "Modelo do portão",
-      flex: 0.8,
-    },
+    
 
        {
       field: "statped", 
@@ -116,6 +113,8 @@ function PedidosConcluidos( { pedidosConcluidos, carregarPedidos }) {
   }
 };
 
+
+
     return (
       <Box display="flex" gap="10px" marginTop="13px">
         <button
@@ -131,19 +130,7 @@ function PedidosConcluidos( { pedidosConcluidos, carregarPedidos }) {
         >
           Editar
         </button>
-        <button
-          onClick={handleDelete}
-          style={{
-            background: "#8B0000",
-            color: "white",
-            border: "none",
-            padding: "4px 8px",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Excluir
-        </button>
+       
       </Box>
     );
   }
@@ -151,7 +138,7 @@ function PedidosConcluidos( { pedidosConcluidos, carregarPedidos }) {
   ]
 
 
-
+if(!open) return null;
   return (
           <Box m="20px">
             <Box m="40px 0 0 0" height="75vh"
@@ -212,7 +199,7 @@ function PedidosConcluidos( { pedidosConcluidos, carregarPedidos }) {
              
       >
               
-
+            <AtualizarPedido open={taAberto} onFechado={() => portao(false)} id={idUsuarioSelecionado} carregarPedidos={carregarPedidos} />
               <DataGrid rows={pedidosConcluidos} columns={columns} localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
               getRowId={(row) => row.codped}
               

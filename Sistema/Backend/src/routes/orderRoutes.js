@@ -1,4 +1,4 @@
-import { createOrder, getAllOrders, getAllOrdersCerto, deleteOrder, updateOrder, getOrderById, getOrdersPendentes, getOrdersConcluidas, getOrdersProducao  } from '../controllers/orderController.js';
+import { createOrder, createOrcamento, getAllOrders, getAllOrdersCerto, deleteOrder, updateOrder, getOrderById, getOrdersPendentes, getOrdersConcluidas, getOrdersProducao, getPedidosPorMes, getPieChartData  } from '../controllers/orderController.js';
 import express from 'express';
 import { requireJWTAuth } from '../config/passport.js';
 
@@ -13,12 +13,19 @@ router.get('/getall', requireJWTAuth, getAllOrders);
 
 router.get('/getallcerto', requireJWTAuth, getAllOrdersCerto ); 
 
+
+// Rota para criar orçamento completo (endereço → cliente → pedido)
+router.post('/createOrcamento', requireJWTAuth, createOrcamento);
+
 router.get('/getpendentes', requireJWTAuth, getOrdersPendentes ); 
 
 router.get('/getconcluidos', requireJWTAuth, getOrdersConcluidas ); 
 
 router.get('/getproducao', requireJWTAuth, getOrdersProducao ); 
 
+router.get('/getpedidospormes', requireJWTAuth, getPedidosPorMes ); 
+
+router.get('/getgraficoPizza', requireJWTAuth, getPieChartData ); 
 
 // Rota para deletar um pedido pelo código
 router.delete('/delete/:codped', requireJWTAuth, deleteOrder);  

@@ -1,5 +1,6 @@
 import orderModel from "../model/orderModel.js";
 import addressModel from "../model/addressModel.js";
+import db from '../config/database.js';
 
 /* * Controlador para gerenciar pedidos
 {
@@ -150,12 +151,57 @@ export const deleteOrder = async (req, res) => {
   }
 }
 
-// Função para atualizar um pedido
+// // Função para atualizar um pedido
+// export const updateOrder = async (req, res) => {
+//   try {
+//     const { codped } = req.params;
+//     const updates = req.body;
+//     const endereçoAntigo = null;
+
+//     if (!updates || Object.keys(updates).length === 0) {
+//       return res.status(400).json({ message: 'Nenhum campo para atualizar.' });
+//     }
+
+//     // Atualizar endereço, se necessário
+//     if (updates.enderped && typeof updates.enderped === 'object' && Object.keys(updates.enderped).length > 0) {
+//       // armazenar o endereço antigo
+      
+      
+//       const order = await orderModel.getOrderById(codped);
+//       if (!order) {
+//         return res.status(404).json({ message: 'Pedido não encontrado.' });
+//       }
+
+//       const endereçoAntigo = order.enderped;
+
+//       const updatedAddress = await addressModel.updateAddress(order.enderped, updates.enderped);
+//       if (updatedAddress.error) {
+//         return res.status(404).json({ error: updatedAddress.error });
+//       }
+//       updates.enderped = updatedAddress.endercod;
+//     }
+
+//     // deleta o endereço antigo se ele foi atualizado
+//     if (endereçoAntigo && endereçoAntigo !== updatedAddress.endercod) {
+//       const deletedAddress = await addressModel.deleteAddress(endereçoAntigo);
+//       if (deletedAddress.error) {
+//         return res.status(404).json({ error: deletedAddress.error });
+//       }
+//     }
+
+//     res.status(200).json(updateOrder);
+//   } catch (error) {
+//     console.error('Erro ao atualizar pedido:', error.message);
+//     res.status(500).json({ error: 'Erro ao atualizar pedido.' });
+//   }
+// };
+
 export const updateOrder = async (req, res) => {
   try {
     const { codped } = req.params;
     const updates = req.body;
-    const endereçoAntigo = null;
+    let enderecoAntigo = null;
+    let updatedAddress = null;
 
     if (!updates || Object.keys(updates).length === 0) {
       return res.status(400).json({ message: 'Nenhum campo para atualizar.' });
@@ -163,34 +209,124 @@ export const updateOrder = async (req, res) => {
 
     // Atualizar endereço, se necessário
     if (updates.enderped && typeof updates.enderped === 'object' && Object.keys(updates.enderped).length > 0) {
-      // armazenar o endereço antigo
-      
-      
       const order = await orderModel.getOrderById(codped);
-      if (!order) {
+      if (!order || order.error) {
         return res.status(404).json({ message: 'Pedido não encontrado.' });
       }
 
-      const endereçoAntigo = order.enderped;
+      enderecoAntigo = order.enderped;
 
-      const updatedAddress = await addressModel.updateAddress(order.enderped, updates.enderped);
+      updatedAddress = await addressModel.updateAddress(order.enderped, updates.enderped);
       if (updatedAddress.error) {
         return res.status(404).json({ error: updatedAddress.error });
       }
+
       updates.enderped = updatedAddress.endercod;
     }
 
-    // deleta o endereço antigo se ele foi atualizado
-    if (endereçoAntigo && endereçoAntigo !== updatedAddress.endercod) {
-      const deletedAddress = await addressModel.deleteAddress(endereçoAntigo);
+    // Atualizar o pedido no banco
+    const pedidoAtualizado = await orderModel.updateOrder(codped, updates);
+    if (pedidoAtualizado.error) {
+      return res.status(404).json({ error: pedidoAtualizado.error });
+    }
+
+    // Deletar endereço antigo se foi alterado
+    if (enderecoAntigo && updatedAddress && enderecoAntigo !== updatedAddress.endercod) {
+      const deletedAddress = await addressModel.deleteAddress(enderecoAntigo);
       if (deletedAddress.error) {
         return res.status(404).json({ error: deletedAddress.error });
       }
     }
 
-    res.status(200).json(updateOrder);
+    res.status(200).json({ mensagem: 'Atualizado com sucesso', pedido: pedidoAtualizado || null });
+
   } catch (error) {
     console.error('Erro ao atualizar pedido:', error.message);
-    res.status(500).json({ error: 'Erro ao atualizar pedido.' });
+    return res.status(500).json({ error: 'Erro ao atualizar pedido.' });
+  }
+};
+
+export const getPedidosPorMes = async (req, res) => {
+  try {
+    const dados = await orderModel.getPedidosPorMes();
+    res.status(200).json(dados);
+  } catch (error) {
+    console.error('Erro ao buscar pedidos por mês:', error.message);
+    res.status(500).json({ error: 'Erro ao buscar pedidos por mês.' });
+  }
+};
+
+export const getPieChartData = async (req, res) => {
+  try {
+    const data = await orderModel.getPieChartData();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Erro ao buscar dados para gráfico de pizza:", error.message);
+    res.status(500).json({ error: "Erro ao buscar dados para gráfico de pizza." });
+  }
+};
+
+
+
+import pgPromise from 'pg-promise';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const pgp = pgPromise();
+
+const connectionString = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
+const dbTx = pgp(connectionString);
+
+export const createOrcamento = async (req, res) => {
+  const {
+    nome,
+    cpf,
+    telefone,
+    email,
+    dataPedido,
+    logradouro,
+    numero,
+    bairro,
+    cidade,
+    uf,
+    cep,
+    altura,
+    comprimento
+  } = req.body;
+
+  try {
+    await dbTx.tx(async t => {
+      // 1. Inserir endereço, sempre com complemento 'casa'
+      const insertEndereco = `
+        INSERT INTO endereco (lgdr, numero, bairro, cidade, estado, cep, complmt)
+        VALUES ($1, $2, $3, $4, $5, $6, 'casa')
+        RETURNING endercod
+      `;
+      const enderecoResult = await t.one(insertEndereco, [logradouro, numero, bairro, cidade, uf, cep]);
+      const enderecoId = enderecoResult.endercod;
+
+      // 2. Inserir cliente
+      const insertCliente = `
+        INSERT INTO cliente (cpf, nome, fone, email, endercli)
+        VALUES ($1, $2, $3, $4, $5)
+      `;
+      await t.none(insertCliente, [cpf, nome, telefone, email, enderecoId]);
+
+      // 3. Calcular valor do pedido
+      const valped = parseFloat(altura) * parseFloat(comprimento);
+
+      // 4. Inserir pedido
+      const insertPedido = `
+        INSERT INTO pedido (cliente, statped, valped, comp, altura, dtpdd, enderped)
+        VALUES ($1, 'espera', $2, $3, $4, $5, $6)
+      `;
+      await t.none(insertPedido, [cpf, valped, comprimento, altura, dataPedido, enderecoId]);
+    });
+
+    res.status(201).json({ message: 'Orçamento criado com sucesso!' });
+
+  } catch (error) {
+    console.error('Erro ao criar orçamento:', error);
+    res.status(500).json({ error: 'Erro interno ao criar orçamento' });
   }
 };

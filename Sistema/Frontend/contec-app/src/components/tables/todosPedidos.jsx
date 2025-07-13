@@ -17,15 +17,11 @@ import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FactoryOutlinedIcon from '@mui/icons-material/FactoryOutlined';
 
 
-function VisualizarPedidos( { pedidos, carregarPedidos }) {
+function VisualizarPedidos( { open, onFechado, pedidos, carregarPedidos }) {
     const [taAberto, portao] = useState(false);
     const [idUsuarioSelecionado, setIdUsuarioSelecionado] = useState(null);
 
     console.log(pedidos)
-
-
-
-
 
 
 
@@ -51,11 +47,11 @@ function VisualizarPedidos( { pedidos, carregarPedidos }) {
       flex: 0.1,
     },
 
-      {
-      field: "tipo_portao", 
-      headerName: "Modelo do portão",
-      flex: 0.8,
-    },
+    //   {
+    //   field: "tipo_portao", 
+    //   headerName: "Modelo do portão",
+    //   flex: 0.8,
+    // },
 
        {
       field: "statped", 
@@ -94,7 +90,7 @@ function VisualizarPedidos( { pedidos, carregarPedidos }) {
   ]
 
 
-
+if(!open) return null;
   return (
           <Box m="20px">
             <Box m="40px 0 0 0" height="75vh"

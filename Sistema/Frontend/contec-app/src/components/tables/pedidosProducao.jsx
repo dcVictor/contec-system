@@ -15,15 +15,18 @@ import AtualizarUsuario from '../updateUser/updateUser';
 import HourglassBottomOutlinedIcon from '@mui/icons-material/HourglassBottomOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FactoryOutlinedIcon from '@mui/icons-material/FactoryOutlined';
+import AtualizarPedido from '../updateOrder/updateOrder';
+import { useAuth } from "../../context/authContext"
 
 
-function PedidosProducao( { pedidosProducao, carregarPedidos }) {
+function PedidosProducao( { open, onFechado, pedidosProducao, carregarPedidos }) {
     const [taAberto, portao] = useState(false);
     const [idUsuarioSelecionado, setIdUsuarioSelecionado] = useState(null);
+    const { usuario } = useAuth();
 
 
 
-  const columns = [
+  let columns = [
     {field: "codped", headerName: "ID", flex: 0.2},
 
 
@@ -45,11 +48,7 @@ function PedidosProducao( { pedidosProducao, carregarPedidos }) {
       flex: 0.1,
     },
 
-      {
-      field: "tipo_portao", 
-      headerName: "Modelo do portão",
-      flex: 0.6,
-    },
+    
 
        {
       field: "statped", 
@@ -87,9 +86,9 @@ function PedidosProducao( { pedidosProducao, carregarPedidos }) {
     {field: "valped", headerName: "Valor", flex: 0.4},
   
 
-
-
-   {
+  ]
+if (usuario?.cargo === "adm" || usuario?.cargo === "Administrador" )
+  columns.push( {
   field: "actions",
   headerName: "Ações",
   flex: 1,
@@ -103,21 +102,21 @@ function PedidosProducao( { pedidosProducao, carregarPedidos }) {
       portao(true)
     };
 
-  const handleDelete = () => {
-  const id = params.row.codped;
-  if (window.confirm("Tem certeza que deseja excluir este pedido?")) {
-    api.delete(`/pedido/delete/${id}`)
-      .then(() => {
-         if (carregarPedidos) carregarPedidos();
-      })
-      .catch((err) => {
-        console.error("Erro ao excluir pedido:", err);
-        alert("Erro ao excluir pedido.");
-      });
-  }
-};
 
-const handUpdate = () => {}
+
+const handUpdate = () => {
+
+    const id = params.row.codped;
+   
+      const response =  api.put(`/pedido/update/${id}`, {
+        statped: 'instalado',
+        
+      });
+      carregarPedidos();
+      alert("Pedido atualizado com sucesso!");
+      carregarPedidos();
+
+}
 
     return (
       <Box display="flex" gap="10px" marginTop="13px">
@@ -152,9 +151,9 @@ const handUpdate = () => {}
     );
   }
 }
-
-  ]
-
+  )
+  
+if(!open) return null;
   return (
           <Box m="20px">
             <Box m="40px 0 0 0" height="75vh"
@@ -214,7 +213,7 @@ const handUpdate = () => {}
                }}
              
       >
-              
+              <AtualizarPedido open={taAberto} onFechado={() => portao(false)} id={idUsuarioSelecionado} carregarPedidos={carregarPedidos} />
 
               <DataGrid rows={pedidosProducao} columns={columns} localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
               getRowId={(row) => row.codped}

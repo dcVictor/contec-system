@@ -10,7 +10,7 @@ export const createService = async (req, res) => {
 
     // Verifica se o pedido existe antes de inserir o serviço
     const order = await orderModel.getOrderById(codped);
-    if (order.error = 'Pedido não encontrado.') {
+    if (order.error == 'Pedido não encontrado.') {
       return res.status(404).json({ message: 'Pedido (codped) não encontrado.' });
     }
     console.log('Inserindo serviço:', order);

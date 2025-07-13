@@ -113,25 +113,53 @@ const getOrderById = async (codped) => {
 
 
 // Função para atualizar o pedido dinamicamente
+// const updateOrder = async (codped, updates) => {
+//   const fields = Object.keys(updates);
+//   const values = Object.values(updates);  
+//   if (fields.length === 0) {
+//     throw new Error('Nenhum campo para atualizar.');
+//   }
+//   const setString = fields.map((field, idx) => `${field} = $${idx + 1}`).join(', ');
+//   const query = `UPDATE pedido SET ${setString} WHERE codped = $${fields.length + 1} RETURNING *`;
+//   try {
+//     const result = await db.query(query, [...values, codped]);
+//     if (result.length === 0) {
+//       return { error: 'Pedido não encontrado.' };
+//     }
+//     return result[0];
+//   } catch (error) {
+//     console.error('Erro ao atualizar pedido:', error.message);
+//     throw error;
+//   }
+// };
+
 const updateOrder = async (codped, updates) => {
   const fields = Object.keys(updates);
-  const values = Object.values(updates);  
+  const values = Object.values(updates);
+
   if (fields.length === 0) {
     throw new Error('Nenhum campo para atualizar.');
   }
+
   const setString = fields.map((field, idx) => `${field} = $${idx + 1}`).join(', ');
   const query = `UPDATE pedido SET ${setString} WHERE codped = $${fields.length + 1} RETURNING *`;
+
   try {
     const result = await db.query(query, [...values, codped]);
-    if (result.length === 0) {
-      return { error: 'Pedido não encontrado.' };
+
+    console.log("Resultado da query UPDATE:", result); // 🔍 debug
+
+    if (!result || !result.rows || result.rows.length === 0) {
+      return { error: 'Pedido não encontrado ou não atualizado.' };
     }
-    return result[0];
+
+    return result.rows[0];
   } catch (error) {
-    console.error('Erro ao atualizar pedido:', error.message);
+    console.error('Erro ao atualizar pedido:', error);
     throw error;
   }
 };
+
 
 // Função que deleta um pedido pelo código
 const deleteOrder = async (codped) => {
@@ -147,9 +175,54 @@ const deleteOrder = async (codped) => {
   }
 };
 
+
+const getPedidosPorMes = async () => {
+  try {
+    const query = `
+      SELECT
+        TO_CHAR(dtpdd, 'FMMonth') AS "Serviços", -- FM para tirar espaços extras no mês
+        COUNT(*) AS "Pedidos"
+      FROM pedido
+      GROUP BY TO_CHAR(dtpdd, 'FMMonth'), EXTRACT(MONTH FROM dtpdd)
+      ORDER BY EXTRACT(MONTH FROM dtpdd);
+    `;
+    const result = await db.query(query);
+    // Se result for um array, retorna direto. Se for objeto com rows, retorna rows
+    return Array.isArray(result) ? result : result.rows;
+  } catch (error) {
+    console.error('Erro ao buscar pedidos por mês:', error);
+    throw error;
+  }
+};
+
+const getPieChartData = async () => {
+  try {
+    const query = `
+      SELECT tipserv AS id, tipserv AS label, COUNT(*) AS value
+      FROM servico
+      GROUP BY tipserv
+      UNION ALL
+      SELECT 'Pedidos' AS id, 'Total pedidos vendidos' AS label, COUNT(*) AS value
+      FROM pedido
+    `;
+    const result = await db.query(query);
+    return result.map(row => ({
+      ...row,
+      value: parseInt(row.value, 10)
+    }));
+  } catch (error) {
+    console.error("Erro ao buscar dados para gráfico de pizza:", error);
+    throw error;
+  }
+};
+
+
+
 export default {
   insertOrder,
   getAllOrders,
+  getPedidosPorMes,
+  getPieChartData,
   getOrdersConcluidas,
   getOrdersPendentes,
   getOrdersProducao,

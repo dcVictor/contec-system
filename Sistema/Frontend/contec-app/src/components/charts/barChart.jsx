@@ -1,45 +1,44 @@
+import { useEffect, useState } from "react";
 import { ResponsiveBar } from "@nivo/bar";
-import { mockBarData as dataBar } from "../../data/mockData";
 import { Box } from "@mui/material";
+import api from "../../services/api.js";
 
 function BarChart() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchDados = async () => {
+      try {
+        const response = await api.get("/pedido/getpedidospormes");
+        setData(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar dados do gráfico:", error);
+      }
+    };
+
+    fetchDados();
+  }, []);
+
   return (
-     <Box m="20px" height="400px" width="100%"> {/* Ajuste a altura e largura conforme necessário */}
+    <Box m="20px" height="400px" width="100%">
       <ResponsiveBar
-        data={dataBar}
-        keys={['Seccionados', 'Enrolar', 'Manutenções']} 
+        data={data}
+        keys={['Pedidos']}
         indexBy="Serviços"
         enableLabel={false}
-        colors={[ 'rgb(117, 87, 10)', '#DAA520', 'rgb(236, 193, 84)']}
+        colors={['rgb(117, 87, 10)']}
         labelSkipWidth={12}
         labelSkipHeight={12}
-        theme={{ 
+        theme={{
           axis: {
-            domain: {
-              line: {
-                stroke: "#fff"
-              }
-            },
-            legend: {
-              text: {
-                fill: "#fff"
-              }
-            },
+            domain: { line: { stroke: "#fff" } },
+            legend: { text: { fill: "#fff" } },
             ticks: {
-              line: {
-                stroke: "#fff",
-                strokeWidth: 1
-              },
-              text: {
-                fill: "#fff"
-              }
+              line: { stroke: "#fff", strokeWidth: 1 },
+              text: { fill: "#fff" }
             }
           },
-          legends: {
-            text: {
-              fill: "#fff"
-            }
-          }
+          legends: { text: { fill: "#fff" } }
         }}
         legends={[
           {
@@ -50,22 +49,15 @@ function BarChart() {
             itemsSpacing: 3,
             itemWidth: 100,
             itemHeight: 16,
-            symbolSize: 18, // Tamanho do símbolo para a legenda
-            effects: [
-              {
-                on: 'hover',
-                style: {
-                  itemOpacity: 1
-                }
-              }
-            ]
+            symbolSize: 18,
+            effects: [{ on: 'hover', style: { itemOpacity: 1 } }]
           }
         ]}
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: 'Mês', // Legenda do eixo X
+          legend: 'Mês',
           legendPosition: 'middle',
           legendOffset: 32
         }}
@@ -73,14 +65,14 @@ function BarChart() {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: 'Número de Vendas/Serviços', // Legenda do eixo Y
+          legend: 'Número de Vendas/Serviços',
           legendPosition: 'middle',
           legendOffset: -40
         }}
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
       />
     </Box>
-  )
+  );
 }
 
 export default BarChart;

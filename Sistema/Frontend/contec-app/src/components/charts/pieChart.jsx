@@ -1,8 +1,21 @@
     import { ResponsivePie } from '@nivo/pie';
-    import { mockPieData as data} from "../../data/mockData";
-import { Box } from '@mui/material';
+    import { Box } from '@mui/material';
+    import { useState, useEffect } from 'react';
+    import api from "../../services/api.js"
 
     function PieChart() {
+
+
+        const [data, setData] = useState([]);
+
+  useEffect(() => {
+    api.get('/pedido/getgraficoPizza')
+      .then(response => setData(response.data))
+      .catch(error => {
+        console.error('Erro ao buscar dados do gráfico de pizza:', error);
+      });
+  }, []);
+
     return (
 <Box
   sx={{

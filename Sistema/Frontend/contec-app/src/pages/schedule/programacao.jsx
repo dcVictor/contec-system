@@ -43,9 +43,14 @@ function Programacao() {
     if (title) {
       try {
         const response = await api.post('/servico/create', {
+          inst: 20000000001,
           tipserv: title,
+          codped: 20,
           dtserv: selected.startStr,
-        });
+          valserv: 5000,            // valor do serviço em centavos ou reais
+            // CPF do instalador (deve existir no banco)
+    
+              });
 
         const novoEvento = response.data;
 

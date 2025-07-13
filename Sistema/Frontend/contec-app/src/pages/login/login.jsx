@@ -18,9 +18,10 @@ const handleSubmit = async (event) => {
       username: username,
       password: password,
     });
+    console.log(response.data);
 
-    const token = response.data.token;
-    login(token); // salva no contexto e localStorage
+    const { token, user } = response.data;  // Pega token e dados do usuário
+    login(token, user); // salva ambos no contexto
     navigate('/home');
   } catch (error) {
     console.error("Erro no login:", error);

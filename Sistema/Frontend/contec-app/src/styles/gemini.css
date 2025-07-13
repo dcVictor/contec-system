@@ -12,6 +12,45 @@ header {
   display: flex;
   width: 100%;
 }
+.chat-box {
+  background-color: #1e1e1e;
+  padding: 15px;
+  border-radius: 8px;
+  max-height: 800px;
+  overflow-y: auto;
+  color: white;
+  margin-top: 20px;
+}
+
+.chat-entry {
+  margin-bottom: 15px;
+}
+
+.chat-box {
+  height: 100vh;
+  overflow-y: auto;
+  background-color:  #1a1a1a;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.chat-message {
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+}
+
+.chat-message.user {
+  background-color: #2a2a2a;
+  text-align: right;
+}
+
+.chat-message.bot {
+  background-color:  #3a3a3a;
+  text-align: left;
+}
 
 .content {
     display: center;

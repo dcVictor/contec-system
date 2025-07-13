@@ -17,7 +17,6 @@ function AtualizarUsuario({open, onFechado, id, carregarUsuarios}) {
       const response = await api.put(`/user/update/${id}`, {
         codusuario: id,
         nome,
-        senha,
         email,
         telefone,
         cargo,
@@ -25,16 +24,16 @@ function AtualizarUsuario({open, onFechado, id, carregarUsuarios}) {
       console.log(response.data)
       carregarUsuarios();
         window.alert("Usuário atualizado com sucesso!")
-      onFechado();
+      
       // Limpa os campos
       setEmail('')
       setUsuario('')
-      setSenha('')
       setTelefone('')
       setCargo('')
+      onFechado();
 
     } catch (error) {
-      console.error("Erro ao cadastrar usuário:", error)
+      console.error("Erro ao atualizar usuário:", error)
     }
   }
 

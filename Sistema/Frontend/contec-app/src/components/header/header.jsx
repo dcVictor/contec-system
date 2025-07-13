@@ -1,19 +1,25 @@
-import "../../styles/header.css"
+import "../../styles/header.css";
+import { useAuth } from "../../context/authContext";
 
 function Header() {
-    return(
+  const { usuario } = useAuth();
 
-        <header>
-            <div class="logo-wrapper">
-                <div class="logo-square"></div>
-                <div class="logo-text">CONTEC</div>
-            </div>
-            <div class="user-info">
-                <div class="user-name" id="userName"></div>
-                <div class="user-group" id="userGroup"></div>
-            </div>
-        </header>
+  return (
+    <header>
+      <div className="logo-wrapper">
+        <div className="logo-square"></div>
+        <div className="logo-text">CONTEC</div>
+      </div>
+      <div className="user-info">
+        <div className="user-name" id="userName">
+          {usuario?.nome || "Usuário não autenticado"}
+        </div>
+        <div className="user-group" id="userGroup">
+          {usuario?.cargo || "-"}
+        </div>
+      </div>
+    </header>
+  );
+}
 
-
-    )}
-    export default Header;
+export default Header;
