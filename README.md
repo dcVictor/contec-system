@@ -18,6 +18,8 @@ Sistema de Gestão de Clientes, Pedidos, Serviços, Instaladores, Peças e Usuá
   - [Frontend](#frontend)
   - [Backend](#backend)
     - [Como Rodar Backend](#como-rodar-backend)
+      - [Banco de Dados](#banco-de-dados)
+      - [Rodando o Servidor](#rodando-o-servidor)
     - [Documentação da API](#documentação-da-api)
 
 
@@ -33,17 +35,20 @@ O ContecSis é um sistema para gestão da empresa Contec do segmento de portões
 ```
 
 ## Frontend
--React
+- React
+- Nivo
+- Mui
+- FullCallendar
+- Vite
 
-### Como Rodar Backend
+### Como Rodar Front-End
 1. Entre na pasta contec-app
 
 2. Execute npm install
 
 3. Execute npm run dev
 
-4. Pronto, Front rodando :D
-
+4. Pronto, seu front está rodando!
 
 
 ## Backend
@@ -57,42 +62,54 @@ O ContecSis é um sistema para gestão da empresa Contec do segmento de portões
 - passport
 
 ### Como Rodar Backend
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/ContecSis.git
-   ```
-2. Instale as dependências do backend:
-   ```bash
-   cd Sistema/Backend
-   npm install
-   ```
-3. Configure o arquivo `.env` com as variáveis de ambiente:
-   ```env
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=contec_db
+
+#### Banco de Dados
+
+1. Crie um banco de dados PostgreSQL.
+
+2. Na pasta Database no arquivo `estrutura.sql`, localiza-se os comandos para a criação das tabelas no seu banco de dados PostgreSQL:
+   
+    [estrutura.sql](Sistema/Database/estrutura.sql)
+
+3. Popule o banco de dados executando o script de inserts no seu banco de dados PostgreSQL:
+  
+    [dados.sql](Sistema/Database/dados.sql)
+
+#### Rodando o Servidor
+
+1. Navegue até a pasta `Sistema/Backend` e instale as dependências:
+```bash
+cd Sistema/Backend
+```
+
+2. Instale o Yarn caso não tenha instalado na sua máquina:
+```bash
+npm install -g yarn
+```
+3. Instale as dependências do projeto:
+```bash
+yarn install
+```
+4. Na pasta `Sistema/Backend`, crie um arquivo `.env` com as seguintes variáveis de ambiente:
+```env
+   DB_HOST=host_do_banco
+   DB_PORT=porta_do_banco
+   DB_NAME=seu_banco
    DB_USER=seu_usuario
    DB_PASSWORD=sua_senha
    JWT_SECRET=sua_chave_secreta
-   PORT=3000
+   PORT=sua_porta
    ```
+Escreva as suas variaveis de ambiente conforme necessário.
 
-4. Faça o insert das tabelas no seu banco de dados PostgreSQL conforme os scripts em `Sistema/Database/estrutura.sql`:
-    ```bash
-    psql -U seu_usuario -d seubanco -f estrutura.sql
-    ```
-
-5. Popule o banco de dados com dados de exemplo usando `Sistema/Database/dados.sql`:
-   ```bash
-   psql -U seu_usuario -d seubanco -f dados.sql
-   ```
-
-6. Inicie o servidor:
-   ```bash
-   npm start
-   ```
-
-> Os scripts `estrutura.sql` e `dados.sql` estão em `Sistema/Database/` e já trazem toda a estrutura e dados de exemplo para testes e desenvolvimento.
+6. Entre na pasta src:
+```bash
+cd src
+```
+7. Inicie o servidor:
+```bash
+node server.js
+```
 
 
 ### Documentação da API
