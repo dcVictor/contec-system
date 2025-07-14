@@ -180,7 +180,7 @@ function ContatosClientes( { contatosClientes, carregarClientes }) {
               
 
               <DataGrid rows={contatosClientes} columns={columns} localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
-              getRowId={(row) => row.nome}
+              getRowId={(row) => row.cpf}
               
                sx={{
                  backgroundColor: '#1a1a1a', // cor de fundo da tabela

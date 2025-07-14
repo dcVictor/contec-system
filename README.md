@@ -33,6 +33,16 @@ O ContecSis é um sistema para gestão da empresa Contec do segmento de portões
 ```
 
 ## Frontend
+-React
+
+### Como Rodar Backend
+1. Entre na pasta contec-app
+
+2. Execute npm install
+
+3. Execute npm run dev
+
+4. Pronto, Front rodando :D
 
 
 

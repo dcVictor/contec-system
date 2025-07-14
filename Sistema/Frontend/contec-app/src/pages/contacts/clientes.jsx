@@ -12,6 +12,7 @@ function Clientes() {
 
     api.get('/cliente/getallcerto')
       .then(res => setContatosClientes(res.data))
+  
       .catch(err => console.error('Erro ao buscar os clientes:', err));
   }
 
