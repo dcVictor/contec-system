@@ -14,7 +14,6 @@ Sistema de Gestão de Clientes, Pedidos, Serviços, Instaladores, Peças e Usuá
 - [ContecSis](#contecsis)
   - [Sumário](#sumário)
   - [Sobre o Projeto](#sobre-o-projeto)
-  - [Estrutura de Pastas](#estrutura-de-pastas)
   - [Frontend](#frontend)
   - [Backend](#backend)
     - [Como Rodar Backend](#como-rodar-backend)
@@ -28,11 +27,6 @@ Sistema de Gestão de Clientes, Pedidos, Serviços, Instaladores, Peças e Usuá
 ## Sobre o Projeto
 
 O ContecSis é um sistema para gestão da empresa Contec do segmento de portões automáticos, assistência técnica e serviços relacionados. O objetivo é por a prova os conhecimentos dos CCRs de Programação II, Banco de dados e Engenharia de Software.
-
-## Estrutura de Pastas
-```
- ...
-```
 
 ## Frontend
 - React
