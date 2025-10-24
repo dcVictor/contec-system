@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://192.168.16.134:3002' // ajuste conforme necessário
+const apiteste = axios.create({
+  baseURL: 'http://localhost:3002' // ajuste conforme necessário
 });
 
 // Interceptor para adicionar o token nas requisições
@@ -30,4 +30,6 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default apiteste;
+
+

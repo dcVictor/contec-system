@@ -17,6 +17,7 @@ import PedidosPendentes from './components/tables/pedidosPendentes.jsx'
 import PedidosProducao from './components/tables/pedidosProducao.jsx'
 import PedidosConcluidos from './components/tables/pedidosConcluidos.jsx'
 import VisualizarPedidos from './components/tables/todosPedidos.jsx'
+import Catracas from './pages/catracas/catracas.jsx'
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/ask" element={<Ask />} />
+        <Route path="/catracas" element={<Catracas />} />
 
         {/* Rotas com layout */}
         <Route element={<Layout />}>
@@ -34,6 +36,7 @@ function App() {
           <Route path="/programacao" element={<Programacao />} />
           <Route path="/orcamentos" element={<Orcamentos />} />
           <Route path="/clientes" element={<Clientes />} />
+          
           <Route path="/pedidos" element={<Pedidos />}>
              <Route path="pendentes" element={<PedidosPendentes />} />
              <Route path="producao" element={<PedidosProducao />} />
