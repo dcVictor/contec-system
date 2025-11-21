@@ -20,6 +20,7 @@ function MenuLateral( ){
                     <li><a id="dashboardbutton" href='/programacao'><i class="fas fa fa-calendar menu-icon" aria-hidden="true"></i>Programação</a></li>
                     <li><a id="dashboardbutton" href='/clientes' > <i class="fas fa-users menu-icon"></i>Clientes</a></li>
                     <li><a id="dashboardbutton" href='/catracas' > <i class="fas fa-users menu-icon"></i>Catracas</a></li>
+                    <li><a id="dashboardbutton" href='/escala' > <i class="fas fa-users menu-icon"></i>Escala</a></li>
                 </ul>
             </div>
             <div class="bottom-menu">

@@ -18,6 +18,7 @@ import PedidosProducao from './components/tables/pedidosProducao.jsx'
 import PedidosConcluidos from './components/tables/pedidosConcluidos.jsx'
 import VisualizarPedidos from './components/tables/todosPedidos.jsx'
 import Catracas from './pages/catracas/catracas.jsx'
+import Escala from './pages/escala/escala.jsx'
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/ask" element={<Ask />} />
         <Route path="/catracas" element={<Catracas />} />
+        <Route path="/escala" element={<Escala />} />
 
         {/* Rotas com layout */}
         <Route element={<Layout />}>
