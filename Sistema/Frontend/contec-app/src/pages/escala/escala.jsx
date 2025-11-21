@@ -78,7 +78,7 @@ function Escala() {
             const config = machineConfigs[mipId];
             // Se config for 0 (Desativada), coloca "N/A", senão coloca Vazio ("")
             if (config === 0) {
-                return Array(TIME_SLOTS.length).fill("N/A");
+                return Array(TIME_SLOTS.length).fill("");
             }
             return Array(TIME_SLOTS.length).fill("");
         });
@@ -275,7 +275,7 @@ function Escala() {
         MIP_IDS.forEach((mipId, mipArrayIndex) => {
             const assignedSlotIndices = mapping[mipId];
             if (!assignedSlotIndices || assignedSlotIndices.length === 0) {
-                 finalMatrix[mipArrayIndex][timeIndex] = "N/A";
+                 finalMatrix[mipArrayIndex][timeIndex] = "";
                  return;
             }
             const operators = assignedSlotIndices.map(slotIdx => slotsState[slotIdx]);
