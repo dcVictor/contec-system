@@ -25,7 +25,7 @@ function MenuLateral( ){
             </div>
             <div class="bottom-menu">
                 <div class="admin-option">
-                    <a href="/ask"><i class="fas fa fa-question-circle menu-icon" aria-hidden="true"></i>Alguma dúvida?</a>
+                
                      {(usuario?.cargo === "adm" || usuario?.cargo === "Administrador")  && (<a href="/admin"><i class="fas fa-user-shield menu-icon"></i>Administrador</a>)}
                 </div>
                 <div class="logout-container">

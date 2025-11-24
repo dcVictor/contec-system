@@ -5,8 +5,8 @@ import {
     Box, Button, Stack, Typography, Paper, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, Chip,
     FormControl, InputLabel, Select, MenuItem, Grid, Divider, Alert,
-    Menu, Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText,
-    TextField, InputAdornment
+    Menu, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemText,
+    TextField, InputAdornment, Checkbox, ListItemIcon
 } from "@mui/material";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -18,7 +18,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import GridOnIcon from '@mui/icons-material/GridOn'; // Ícone para o novo botão
+import GridOnIcon from '@mui/icons-material/GridOn';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 // --- CONFIGURAÇÃO DOS DADOS ---
 const MIP_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 25, 24, 23, 14, 15, 16, 17, 21, 22, 20, 18, 19];
@@ -56,6 +57,7 @@ function Escala() {
     const [openSwapDialog, setOpenSwapDialog] = useState(false);
     const [searchTerm, setSearchTerm] = useState(""); 
     const [isFillMode, setIsFillMode] = useState(false);
+    const [pendingSelection, setPendingSelection] = useState([]);
 
     const openMenu = Boolean(anchorEl);
 
@@ -71,18 +73,14 @@ function Escala() {
         setMachineConfigs(prev => ({ ...prev, [mipId]: parseFloat(value) }));
     };
 
-    // --- NOVA FUNÇÃO: ABRIR TABELA EM BRANCO ---
     const handleOpenBlankTable = () => {
-        // Cria uma matriz vazia respeitando a configuração das máquinas
         const blankMatrix = MIP_IDS.map(mipId => {
             const config = machineConfigs[mipId];
-            // Se config for 0 (Desativada), coloca "N/A", senão coloca Vazio ("")
             if (config === 0) {
-                return Array(TIME_SLOTS.length).fill("");
+                return Array(TIME_SLOTS.length).fill("N/A");
             }
             return Array(TIME_SLOTS.length).fill("");
         });
-        
         setDisplayMatrix(blankMatrix);
         setShowConfig(false);
     };
@@ -139,27 +137,45 @@ function Escala() {
     };
 
     const handleOpenSwapDialog = (fillToEnd = false) => {
+        const { rowIndex, colIndex } = selectedCell;
+        let currentOperators = [];
+        if (rowIndex !== null && colIndex !== null) {
+            const cellValue = displayMatrix[rowIndex][colIndex];
+            if (cellValue && cellValue !== "" && cellValue !== "N/A") {
+                currentOperators = cellValue.split(" / ");
+            }
+        }
+        setPendingSelection(currentOperators); 
         setAnchorEl(null);
         setSearchTerm(""); 
         setIsFillMode(fillToEnd);
         setOpenSwapDialog(true);
     };
 
-    const confirmSwap = (newOperatorName) => {
+    const toggleOperatorInSelection = (operatorName) => {
+        setPendingSelection(prev => {
+            if (prev.includes(operatorName)) {
+                return prev.filter(name => name !== operatorName); 
+            } else {
+                return [...prev, operatorName]; 
+            }
+        });
+    };
+
+    const handleSaveSwap = () => {
         const { rowIndex, colIndex } = selectedCell;
         if (rowIndex !== null && colIndex !== null) {
             const newMatrix = [...displayMatrix.map(row => [...row])];
-            
+            const newCellValue = pendingSelection.join(" / ");
             if (isFillMode) {
                 for (let i = colIndex; i < TIME_SLOTS.length; i++) {
                     if (newMatrix[rowIndex][i] !== "N/A") {
-                        newMatrix[rowIndex][i] = newOperatorName;
+                        newMatrix[rowIndex][i] = newCellValue;
                     }
                 }
             } else {
-                newMatrix[rowIndex][colIndex] = newOperatorName;
+                newMatrix[rowIndex][colIndex] = newCellValue;
             }
-            
             setDisplayMatrix(newMatrix);
         }
         setOpenSwapDialog(false);
@@ -184,7 +200,6 @@ function Escala() {
         return newArray;
     };
 
-    // --- ALGORITMO V27 (Inalterado) ---
     const generateSchedule = () => {
         if (db.length === 0) { alert("Aguarde carregar dados..."); return; }
 
@@ -198,9 +213,15 @@ function Escala() {
             const req = machineConfigs[mipId];
             slotMapping[mipId] = [];
             if (req >= 1) {
-                for (let i = 0; i < req; i++) { slotMapping[mipId].push(currentSlotIndex); currentSlotIndex++; }
-            } else if (req === 0.5) { halfMips.push(mipId); }
+                for (let i = 0; i < req; i++) { 
+                    slotMapping[mipId].push(currentSlotIndex); 
+                    currentSlotIndex++; 
+                }
+            } else if (req === 0.5) { 
+                halfMips.push(mipId); 
+            }
         });
+        
         for (let i = 0; i < halfMips.length; i += 2) {
             const mip1 = halfMips[i]; const mip2 = halfMips[i + 1];
             slotMapping[mip1].push(currentSlotIndex);
@@ -219,7 +240,6 @@ function Escala() {
         let leftoversPool = [];    
 
         let initialPool = shuffleArray([...regularOperators]);
-        
         currentSlotsState = currentSlotsState.map(() => {
             if (initialPool.length > 0) return initialPool.shift();
             return { name: "" }; 
@@ -284,19 +304,70 @@ function Escala() {
         });
     }
 
+    // --- FUNÇÃO EXCEL ATUALIZADA COM LOGICA DE FONTE E LARGURA ---
     const exportToExcel = () => {
         if (displayMatrix.length === 0) return;
         const excelData = [];
+        
+        // Cabeçalhos
         excelData.push(["MIP", ...TIME_SLOTS]);
+        
+        // Dados
         MIP_IDS.forEach((mipId, index) => {
             const rowData = [mipId];
             if (displayMatrix[index]) { rowData.push(...displayMatrix[index]); }
             excelData.push(rowData);
         });
+        
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(excelData);
-        const wscols = [{ wch: 8 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
+
+        // 1. DEFINIÇÃO DE LARGURAS (MIP=4, OUTRAS=20)
+        const wscols = [
+            { wch: 4 }, // Coluna A (MIP) largura 4
+            ...TIME_SLOTS.map(() => ({ wch: 20 })) // Colunas de horário largura 20
+        ];
         ws['!cols'] = wscols;
+
+        // 2. ESTILIZAÇÃO (BORDAS + FONTE CONDICIONAL)
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+                if (!ws[cell_address]) continue;
+
+                const cell = ws[cell_address];
+                const cellValue = cell.v ? String(cell.v) : "";
+                
+                // Verifica quantos nomes existem (baseado no separador " / ")
+                // Se tiver 2 barras (ex: "Nome / Nome / Nome"), tem 3 nomes.
+                const numberOfOperators = cellValue.split('/').length;
+                
+                // Lógica da Fonte: 3 ou mais nomes = 11, senão = 12 (padrão)
+                const fontSize = numberOfOperators >= 3 ? 11 : 12;
+
+                // Aplica estilo
+                cell.s = {
+                    border: {
+                        top: { style: "thin", color: { rgb: "000000" } },
+                        bottom: { style: "thin", color: { rgb: "000000" } },
+                        left: { style: "thin", color: { rgb: "000000" } },
+                        right: { style: "thin", color: { rgb: "000000" } }
+                    },
+                    alignment: { 
+                        vertical: "center", 
+                        horizontal: "center",
+                        wrapText: true 
+                    },
+                    font: {
+                        name: "Calibri",
+                        sz: fontSize, // Aplica o tamanho calculado
+                        bold: R === 0 // Negrito se for cabeçalho
+                    }
+                };
+            }
+        }
+
         XLSX.utils.book_append_sheet(wb, ws, "Escala V28");
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         const data = new Blob([wbout], { type: 'application/octet-stream' });
@@ -317,26 +388,30 @@ function Escala() {
     return (
         <Paper elevation={2} sx={{ p: 3, m: 2 }}>
             <Box>
-            
-
                 <Button startIcon={<SettingsIcon />} onClick={() => setShowConfig(!showConfig)} sx={{ mb: 2 }}>
                     {showConfig ? "Ocultar Configuração" : "Mostrar Configuração de Máquinas"}
                 </Button>
 
                 {showConfig && (
                     <Paper variant="outlined" sx={{ p: 2, mb: 3, backgroundColor: '#f8f9fa' }}>
-                         <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>Configurar Crédito:</Typography>
+                         <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>Configurar Crédito (Número de Operadores):</Typography>
                          {configError && <Alert severity="warning" sx={{ mb: 2 }}>{configError}</Alert>}
                         <Grid container spacing={2}>
                             {MIP_IDS.map(mipId => (
                                 <Grid item xs={6} sm={4} md={3} lg={2} key={mipId}>
                                     <FormControl fullWidth size="small">
                                         <InputLabel id={`label-mip-${mipId}`}>MIP {mipId}</InputLabel>
-                                        <Select labelId={`label-mip-${mipId}`} value={machineConfigs[mipId]} label={`MIP ${mipId}`} onChange={(e) => handleConfigChange(mipId, e.target.value)}>
+                                        <Select 
+                                            labelId={`label-mip-${mipId}`} 
+                                            value={machineConfigs[mipId]} 
+                                            label={`MIP ${mipId}`} 
+                                            onChange={(e) => handleConfigChange(mipId, e.target.value)}
+                                        >
                                             <MenuItem value={0}>Desativada</MenuItem>
                                             <MenuItem value={0.5}>1/2 Op.</MenuItem>
                                             <MenuItem value={1}>1 Op.</MenuItem>
                                             <MenuItem value={2}>2 Op.</MenuItem>
+                                            <MenuItem value={3}>3 Op.</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -348,10 +423,7 @@ function Escala() {
 
                 <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
                     <Button variant="contained" color="primary" startIcon={<ShuffleIcon />} onClick={generateSchedule}>Gerar Escala</Button>
-                    
-                    {/* NOVO BOTÃO AQUI */}
                     <Button variant="outlined" color="secondary" startIcon={<GridOnIcon />} onClick={handleOpenBlankTable}>Abrir Tabela em Branco</Button>
-
                     <Button variant="outlined" startIcon={<DownloadIcon />} onClick={exportToExcel} disabled={displayMatrix.length === 0}>Baixar Escala</Button>
                 </Stack>
 
@@ -395,7 +467,9 @@ function Escala() {
                                                          <span style={{whiteSpace: cellValue.includes('/') ? 'pre-wrap' : 'nowrap'}}>{cellValue.replace(' / ', '\n')}</span>
                                                          <Chip label="Pausa" size="small" color="warning" variant="outlined" sx={{height: 20, fontSize: '0.7rem'}} />
                                                      </Stack>
-                                                 ) : cellValue}
+                                                 ) : (
+                                                    <span style={{whiteSpace: 'pre-wrap'}}>{cellValue.split(' / ').join('\n')}</span>
+                                                 )}
                                             </TableCell>
                                         )})}
                                     </TableRow>
@@ -408,24 +482,24 @@ function Escala() {
                 <Menu id="edit-menu" anchorEl={anchorEl} open={openMenu} onClose={handleCloseMenu}>
                     <MenuItem onClick={() => handleOpenSwapDialog(false)} sx={{ color: 'primary.main' }}>
                         {isSelectedCellEmpty() ? (
-                            <> <AddCircleOutlineIcon fontSize="small" sx={{ mr: 1 }} /> Adicionar (Só este) </>
+                            <> <AddCircleOutlineIcon fontSize="small" sx={{ mr: 1 }} /> Adicionar / Editar </>
                         ) : (
-                            <> <SwapHorizIcon fontSize="small" sx={{ mr: 1 }} /> Trocar (Só este) </>
+                            <> <SwapHorizIcon fontSize="small" sx={{ mr: 1 }} /> Editar Operadores (Trocar/Adicionar) </>
                         )}
                     </MenuItem>
 
                     <MenuItem onClick={() => handleOpenSwapDialog(true)} sx={{ color: 'secondary.main', fontWeight: 'medium' }}>
-                         <KeyboardDoubleArrowRightIcon fontSize="small" sx={{ mr: 1 }} /> Adicionar até o Fim
+                         <KeyboardDoubleArrowRightIcon fontSize="small" sx={{ mr: 1 }} /> Editar até o Fim
                     </MenuItem>
 
                     <Divider />
                     
                     <MenuItem onClick={handleDeleteOperator} sx={{ color: 'text.secondary' }}>
-                        <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Apagar (Só este)
+                        <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Apagar (Esvaziar Slot)
                     </MenuItem>
                     
                     <MenuItem onClick={handleClearUntilEnd} sx={{ color: 'error.main' }}>
-                        <DeleteSweepIcon fontSize="small" sx={{ mr: 1 }} /> Limpar até o Fim
+                        <DeleteSweepIcon fontSize="small" sx={{ mr: 1 }} /> Esvaziar até o Fim
                     </MenuItem>
 
                     {!isSelectedCellEmpty() && (
@@ -435,16 +509,33 @@ function Escala() {
                     )}
                 </Menu>
 
-                <Dialog open={openSwapDialog} onClose={() => setOpenSwapDialog(false)} maxWidth="xs" fullWidth>
+                <Dialog open={openSwapDialog} onClose={() => setOpenSwapDialog(false)} maxWidth="sm" fullWidth>
                     <DialogTitle>
-                        {isSelectedCellEmpty() ? "Adicionar Operador" : "Trocar Operador"}
+                        Editar Operadores no Slot
                         {isFillMode && <Typography component="span" color="secondary" variant="caption" sx={{ml: 1, fontWeight: 'bold'}}>(Até o final)</Typography>}
                     </DialogTitle>
-                    <Box sx={{ px: 3, pb: 1 }}>
+                    
+                    <Box sx={{ px: 3, pt: 1, pb: 1 }}>
+                        <Typography variant="caption" color="text.secondary" gutterBottom>
+                            Selecionados ({pendingSelection.length}):
+                        </Typography>
+                        <Stack direction="row" flexWrap="wrap" gap={1} sx={{ minHeight: '40px', mb: 2, p: 1, border: '1px dashed #ccc', borderRadius: 1 }}>
+                            {pendingSelection.length === 0 && <Typography variant="body2" color="text.disabled" sx={{fontStyle:'italic'}}>Nenhum operador selecionado (Vazio)</Typography>}
+                            {pendingSelection.map(name => (
+                                <Chip 
+                                    key={name} 
+                                    label={name} 
+                                    onDelete={() => toggleOperatorInSelection(name)}
+                                    color="primary" 
+                                    size="small"
+                                />
+                            ))}
+                        </Stack>
+
                         <TextField 
                             fullWidth 
                             size="small" 
-                            placeholder="Buscar nome..." 
+                            placeholder="Buscar nome para adicionar..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             InputProps={{
@@ -456,18 +547,46 @@ function Escala() {
                             }}
                         />
                     </Box>
+
                     <DialogContent dividers sx={{ maxHeight: '400px' }}>
                         <List dense>
-                            <ListItem button onClick={() => confirmSwap("")}>
-                                <ListItemText primary="Limpar Slot (Vazio)" sx={{color: 'text.secondary'}} />
-                            </ListItem>
-                            {filteredOperators.map((op) => (
-                                <ListItem button key={op.id} onClick={() => confirmSwap(op.name)}>
-                                    <ListItemText primary={op.name} secondary={`Pausa: ${op.breakTime}`} />
+                            {filteredOperators.map((op) => {
+                                const isSelected = pendingSelection.includes(op.name);
+                                return (
+                                <ListItem 
+                                    button 
+                                    key={op.id} 
+                                    onClick={() => toggleOperatorInSelection(op.name)}
+                                    selected={isSelected}
+                                >
+                                    <ListItemIcon>
+                                        <Checkbox
+                                            edge="start"
+                                            checked={isSelected}
+                                            tabIndex={-1}
+                                            disableRipple
+                                            size="small"
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText 
+                                        primary={op.name} 
+                                        secondary={`Pausa: ${op.breakTime}`} 
+                                        primaryTypographyProps={{ fontWeight: isSelected ? 'bold' : 'normal' }}
+                                    />
                                 </ListItem>
-                            ))}
+                            )})}
                         </List>
                     </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenSwapDialog(false)}>Cancelar</Button>
+                        <Button 
+                            onClick={handleSaveSwap} 
+                            variant="contained" 
+                            startIcon={<CheckCircleIcon />}
+                        >
+                            Confirmar Alteração
+                        </Button>
+                    </DialogActions>
                 </Dialog>
 
             </Box>
