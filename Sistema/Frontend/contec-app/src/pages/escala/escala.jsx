@@ -6,8 +6,8 @@ import {
     TableCell, TableContainer, TableHead, TableRow, Chip, Drawer,
     FormControl, InputLabel, Select, MenuItem, Grid, Divider, Alert,
     Menu, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemText,
-    TextField, InputAdornment, Checkbox, ListItemIcon
-} from "@mui/material";
+    TextField, InputAdornment, Checkbox, ListItemIcon, IconButton
+} from "@mui/material"; 
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DownloadIcon from '@mui/icons-material/Download';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -23,6 +23,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PeopleIcon from '@mui/icons-material/People'; 
 import GroupOffIcon from '@mui/icons-material/GroupOff'; 
 import StarIcon from '@mui/icons-material/Star'; 
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'; 
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'; 
 
 // --- CONFIGURAÇÃO DOS DADOS ---
 const MIP_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 25, 24, 23, 14, 15, 16, 17, 21, 22, 20, 18, 19];
@@ -51,12 +55,12 @@ const OPERATORS_DB_INITIAL = [
     { id: 35, name: "Jesus", breakTime: "08:20", isActive: !INACTIVE_AT_START.has("Jesus"), isPriority: PRIORITY_NAMES_MAP.has("Jesus") },
     { id: 6, name: "Ana Flávia", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Ana Flávia"), isPriority: PRIORITY_NAMES_MAP.has("Ana Flávia") }, 
     { id: 7, name: "Heidermar", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Heidermar"), isPriority: PRIORITY_NAMES_MAP.has("Heidermar") },
-    { id: 8, name: "Victoria", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Victoria"), isPriority: PRIORITY_NAMES_MAP.has("Victoria") }, // **MUDANÇA AQUI**
+    { id: 8, name: "Victoria", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Victoria"), isPriority: PRIORITY_NAMES_MAP.has("Victoria") },
     { id: 9, name: "Simone", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Simone"), isPriority: PRIORITY_NAMES_MAP.has("Simone") },
     { id: 10, name: "Ilenir", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Ilenir"), isPriority: PRIORITY_NAMES_MAP.has("Ilenir") }, 
     { id: 32, name: "Salete", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Salete"), isPriority: PRIORITY_NAMES_MAP.has("Salete") },
     { id: 37, name: "Larissa", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Larissa"), isPriority: PRIORITY_NAMES_MAP.has("Larissa") }, 
-    { id: 38, name: "Danyelis", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Danyelis"), isPriority: PRIORITY_NAMES_MAP.has("Danyelis") }, // **MUDANÇA AQUI**
+    { id: 38, name: "Danyelis", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Danyelis"), isPriority: PRIORITY_NAMES_MAP.has("Danyelis") },
     { id: 39, name: "Marcia B", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Marcia B"), isPriority: PRIORITY_NAMES_MAP.has("Marcia B") }, 
     { id: 40, name: "Gabriel", breakTime: "09:30", isActive: !INACTIVE_AT_START.has("Gabriel"), isPriority: PRIORITY_NAMES_MAP.has("Gabriel") },
     { id: 11, name: "Ana Garcia", breakTime: "10:40", isActive: !INACTIVE_AT_START.has("Ana Garcia"), isPriority: PRIORITY_NAMES_MAP.has("Ana Garcia") }, 
@@ -70,7 +74,7 @@ const OPERATORS_DB_INITIAL = [
     { id: 16, name: "Freddy", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Freddy"), isPriority: PRIORITY_NAMES_MAP.has("Freddy") }, 
     { id: 17, name: "Sandra", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Sandra"), isPriority: PRIORITY_NAMES_MAP.has("Sandra") },
     { id: 18, name: "Diana", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Diana"), isPriority: PRIORITY_NAMES_MAP.has("Diana") }, 
-    { id: 19, name: "Gregorio", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Gregorio"), isPriority: PRIORITY_NAMES_MAP.has("Gregorio") }, // **MUDANÇA AQUI**
+    { id: 19, name: "Gregorio", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Gregorio"), isPriority: PRIORITY_NAMES_MAP.has("Gregorio") },
     { id: 20, name: "Augusto", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Augusto"), isPriority: PRIORITY_NAMES_MAP.has("Augusto") }, 
     { id: 36, name: "Freidimar", breakTime: "11:50", isActive: !INACTIVE_AT_START.has("Freidimar"), isPriority: PRIORITY_NAMES_MAP.has("Freidimar") }
 ];
@@ -81,6 +85,12 @@ function Escala() {
     const [showConfig, setShowConfig] = useState(false);
     const [configError, setConfigError] = useState("");
     
+    // COLUNAS TRAVADAS
+    const [lockedColumns, setLockedColumns] = useState(Array(TIME_SLOTS.length).fill(false));
+    
+    // --- NOVO ESTADO: LINHAS TRAVADAS ---
+    const [lockedRows, setLockedRows] = useState(Array(MIP_IDS.length).fill(false));
+
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedCell, setSelectedCell] = useState({ rowIndex: null, colIndex: null });
     const [openSwapDialog, setOpenSwapDialog] = useState(false);
@@ -95,9 +105,10 @@ function Escala() {
     const [openManageOperators, setOpenManageOperators] = useState(false);
     const [tempOperatorData, setTempOperatorData] = useState([]);
     
-    // --- ESTADOS DE SOBRA/STANDBY ---
+    // ESTADOS DO SOBRANDO
     const [standbyOperatorsList, setStandbyOperatorsList] = useState([]);
     const [openStandbyDrawer, setOpenStandbyDrawer] = useState(false);
+    const [standbySlotIndex, setStandbySlotIndex] = useState(0); 
 
     const openMenu = Boolean(anchorEl);
 
@@ -109,20 +120,33 @@ function Escala() {
 
     useEffect(() => { 
         setTempOperatorData([...db]);
-        // Garante que a lista de sobrando é calculada na primeira renderização se a matriz estiver preenchida.
         if (displayMatrix.length > 0) {
             syncStandbyList(displayMatrix, db);
         } else {
-             // Se a tabela estiver vazia, todos os ativos são considerados "sobrando"
              setStandbyOperatorsList(db.filter(op => op.isActive).map(op => op.name).sort());
         }
-    }, [db]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [db]); 
 
+    // --- MANIPULAÇÃO DE TRAVAMENTO DE COLUNA ---
+    const toggleColumnLock = (index) => {
+        setLockedColumns(prev => {
+            const newLocked = [...prev];
+            newLocked[index] = !newLocked[index];
+            return newLocked;
+        });
+    };
 
-    // --- NOVA FUNÇÃO DE SINCRONIZAÇÃO DA LISTA DE SOBRANDO ---
+    // --- NOVA FUNÇÃO: MANIPULAÇÃO DE TRAVAMENTO DE LINHA ---
+    const toggleRowLock = (index) => {
+        setLockedRows(prev => {
+            const newLocked = [...prev];
+            newLocked[index] = !newLocked[index];
+            return newLocked;
+        });
+    };
+
     const syncStandbyList = (matrix, currentDb) => {
         if (matrix.length === 0) {
-            // Se a matriz estiver vazia, todos os ativos estão sobrando.
             setStandbyOperatorsList(currentDb.filter(op => op.isActive).map(op => op.name).sort());
             return;
         }
@@ -130,9 +154,10 @@ function Escala() {
         const activeOperators = new Set(currentDb.filter(op => op.isActive).map(op => op.name));
         const standbyList = [];
         
-        // A lista de sobrando é determinada apenas pelos operadores que não foram escalados no slot 05:20
+        // Padrão: Sincroniza baseado na primeira coluna (05:20) para o botão principal
         const firstSlotColumnIndex = 0;
         const allocatedInFirstSlot = new Set();
+        
         matrix.forEach(row => {
             const cellValue = row[firstSlotColumnIndex];
             if (cellValue && cellValue !== "N/A" && cellValue !== "") {
@@ -142,7 +167,6 @@ function Escala() {
             }
         });
 
-        // Os operadores de Standby são todos os ATIVOS que NÃO estão alocados no slot 05:20
         activeOperators.forEach(name => {
             if (!allocatedInFirstSlot.has(name)) {
                 standbyList.push(name);
@@ -151,8 +175,32 @@ function Escala() {
 
         setStandbyOperatorsList(standbyList.sort());
     };
-    // -------------------------------------------------------------------------
 
+    const getStandbyAtSlot = (slotIndex) => {
+        if (displayMatrix.length === 0) {
+            return db.filter(op => op.isActive).map(op => op.name).sort();
+        }
+
+        const activeOperators = db.filter(op => op.isActive).map(op => op.name);
+        const assignedInSlot = new Set();
+
+        displayMatrix.forEach(row => {
+            const val = row[slotIndex];
+            if (val && val !== "N/A" && val !== "") {
+                val.split(" / ").forEach(name => assignedInSlot.add(name));
+            }
+        });
+
+        return activeOperators.filter(name => !assignedInSlot.has(name)).sort();
+    };
+
+    const handleNextStandbySlot = () => {
+        setStandbySlotIndex(prev => Math.min(prev + 1, TIME_SLOTS.length - 1));
+    };
+
+    const handlePrevStandbySlot = () => {
+        setStandbySlotIndex(prev => Math.max(prev - 1, 0));
+    };
 
     const handleConfigChange = (mipId, value) => {
         setMachineConfigs(prev => ({ ...prev, [mipId]: parseFloat(value) }));
@@ -168,7 +216,9 @@ function Escala() {
         });
         setDisplayMatrix(blankMatrix);
         setShowConfig(false);
-        syncStandbyList(blankMatrix, db); // Todos os ativos vão para a lista de sobrando
+        setLockedColumns(Array(TIME_SLOTS.length).fill(false)); 
+        setLockedRows(Array(MIP_IDS.length).fill(false)); // Reseta os cadeados das linhas
+        syncStandbyList(blankMatrix, db); 
     };
 
     const handleCellClick = (event, rowIndex, colIndex, cellValue) => {
@@ -182,16 +232,12 @@ function Escala() {
         setAnchorEl(null);
     };
 
-    // --- FUNÇÕES DE LIMPEZA ATUALIZADAS PARA SINCRONIZAÇÃO ---
-
     const handleDeleteOperator = () => {
         const { rowIndex, colIndex } = selectedCell;
         if (rowIndex !== null && colIndex !== null) {
             const newMatrix = [...displayMatrix.map(row => [...row])];
             newMatrix[rowIndex][colIndex] = ""; 
             setDisplayMatrix(newMatrix);
-            
-            // Sincroniza a lista de sobrando
             syncStandbyList(newMatrix, db); 
         }
         setAnchorEl(null);
@@ -208,8 +254,6 @@ function Escala() {
                 }
             }
             setDisplayMatrix(newMatrix);
-            
-            // Sincroniza a lista de sobrando
             syncStandbyList(newMatrix, db);
         }
         setAnchorEl(null);
@@ -225,16 +269,11 @@ function Escala() {
                 row.map(cellValue => cellValue === operatorName ? "" : cellValue)
             );
             setDisplayMatrix(newMatrix);
-            
-            // Sincroniza a lista de sobrando
             syncStandbyList(newMatrix, db);
         }
         setAnchorEl(null);
         setSelectedCell({ rowIndex: null, colIndex: null });
     };
-
-    // --- FIM DAS FUNÇÕES DE LIMPEZA ATUALIZADAS ---
-
 
     const handleOpenSwapDialog = (fillToEnd = false) => {
         const { rowIndex, colIndex } = selectedCell;
@@ -262,7 +301,6 @@ function Escala() {
         });
     };
 
-    // --- FUNÇÃO DE VERIFICAÇÃO SIMULTÂNEA (ALOCAÇÃO POR HORÁRIO) (inalterada) ---
     const checkMultipleMIPs = (operatorNames, currentRowIndex, currentColIndex) => {
         let warnings = [];
         const simultaneousAllocations = {}; 
@@ -285,12 +323,9 @@ function Escala() {
 
         operatorNames.forEach(name => {
             const currentMIP = MIP_IDS[currentRowIndex];
-            
             let allocatedMIPs = new Set(simultaneousAllocations[name] || []);
             allocatedMIPs.add(currentMIP);
-            
             const totalAllocations = allocatedMIPs.size;
-            
             if (totalAllocations > 2) {
                 const mipList = Array.from(allocatedMIPs).sort((a, b) => a - b).join(', ');
                 warnings.push(`O operador **${name}** já está alocado em **${totalAllocations - 1}** outras MIPs neste horário. (Total: ${mipList}).`);
@@ -298,20 +333,17 @@ function Escala() {
         });
 
         const hasWarning = warnings.length > 0;
-        
         return {
             hasWarning: hasWarning,
             warningMsg: hasWarning ? `**ALERTA DE ALOCAÇÃO EXCESSIVA SIMULTÂNEA**\n\n${warnings.join('\n')}\n\nO(s) operador(es) será(ão) alocado(s) em mais de duas MIPs **no mesmo horário (${TIME_SLOTS[currentColIndex]})**. Tem certeza que deseja alocar?` : null
         };
     };
 
-    // --- FUNÇÃO DE SALVAR SWAP ATUALIZADA PARA SINCRONIZAÇÃO ---
     const handleSaveSwap = () => {
         const { rowIndex, colIndex } = selectedCell;
         if (rowIndex === null || colIndex === null) return;
         
         const newCellValue = pendingSelection.join(" / ");
-        
         const { hasWarning, warningMsg } = checkMultipleMIPs(pendingSelection, rowIndex, colIndex);
 
         const executeSave = () => {
@@ -328,9 +360,7 @@ function Escala() {
             }
 
             setDisplayMatrix(newMatrix);
-            // Sincroniza a lista de sobrando após a alteração manual
             syncStandbyList(newMatrix, db); 
-            
             setOpenMultiMIPWarning(false); 
             setSelectedCell({ rowIndex: null, colIndex: null });
         };
@@ -345,7 +375,6 @@ function Escala() {
             setOpenSwapDialog(false);
         }
     };
-    // --- FIM DA FUNÇÃO DE SALVAR SWAP ATUALIZADA ---
 
     const isSelectedCellEmpty = () => {
         const { rowIndex, colIndex } = selectedCell;
@@ -354,7 +383,6 @@ function Escala() {
         const val = displayMatrix[rowIndex][colIndex];
         return !val || val === "";
     };
-
 
     const shuffleArray = (array) => {
         let currentIndex = array.length, randomIndex;
@@ -369,7 +397,7 @@ function Escala() {
 
     const generateSchedule = () => {
         const regularOperators = db.filter(op => op.isActive); 
-        if (regularOperators.length === 0) { alert("Nenhum operador ativo para gerar a escala."); return; }
+        if (regularOperators.length === 0) { alert("Nenhum operador ativo."); return; }
 
         const halfCount = Object.values(machineConfigs).filter(v => v === 0.5).length;
         setConfigError(halfCount % 2 !== 0 ? "Atenção: Número ímpar de máquinas '1/2'." : "");
@@ -399,96 +427,204 @@ function Escala() {
         const totalSlots = currentSlotIndex;
         if (totalSlots === 0) { alert("Nenhuma máquina ativa."); return; }
 
+        let newMatrix = displayMatrix.length > 0 
+            ? displayMatrix.map(row => [...row]) 
+            : MIP_IDS.map(mipId => {
+                const config = machineConfigs[mipId];
+                return config === 0 ? Array(TIME_SLOTS.length).fill("N/A") : Array(TIME_SLOTS.length).fill("");
+            });
+
         let currentSlotsState = Array(totalSlots).fill(null);
-        const finalMatrix = Array(MIP_IDS.length).fill(null).map(() => []);
-
-        // --- INÍCIO DA LÓGICA DE PRIORIZAÇÃO (Slot 05:20) ---
-        
-        let priorityOperatorsPool = shuffleArray(regularOperators.filter(op => op.isPriority));
-        let regularOperatorsPool = shuffleArray(regularOperators.filter(op => !op.isPriority));
-        
-        // 1. Identifica os índices dos slots alocados a MIPs Críticas
-        const criticalSlotIndices = new Set();
-        MIP_IDS.forEach((mipId, mipIndex) => {
-            if (CRITICAL_MIPS.includes(mipId) && machineConfigs[mipId] > 0) {
-                slotMapping[mipId].forEach(slotIdx => criticalSlotIndices.add(slotIdx));
-            }
-        });
-
-        // 2. Preenche os slots Críticos com Operadores Prioritários
-        criticalSlotIndices.forEach(slotIdx => {
-            if (currentSlotsState[slotIdx] === null) {
-                if (priorityOperatorsPool.length > 0) {
-                    currentSlotsState[slotIdx] = priorityOperatorsPool.shift();
-                }
-            }
-        });
-
-        // 3. Preenche o restante dos slots com o pool restante (Prioritários não usados + Regulares)
-        let initialPool = [...priorityOperatorsPool, ...regularOperatorsPool];
-        
-        currentSlotsState = currentSlotsState.map((slot, slotIdx) => {
-            if (slot === null) {
-                if (initialPool.length > 0) return initialPool.shift();
-                return { name: "" }; 
-            }
-            return slot;
-        });
-
-        // 4. Captura os operadores que sobraram (standby)
-        let standbyOperators = [...initialPool];
-        
-        // --- ATUALIZAÇÃO DO ESTADO DE SOBRA AQUI ---
-        setStandbyOperatorsList(standbyOperators.map(op => op.name).sort());
-        
-        // --- FIM DA LÓGICA DE PRIORIZAÇÃO ---
-
-        saveSlotsToMatrix(currentSlotsState, 0, finalMatrix, slotMapping);
-
         let operatorsOnBreak = []; 
-        let leftoversPool = [];    
+        let leftoversPool = [];
+        let standbyOperators = [];
 
-        for (let timeIndex = 1; timeIndex < TIME_SLOTS.length; timeIndex++) {
+        for (let timeIndex = 0; timeIndex < TIME_SLOTS.length; timeIndex++) {
             const timeSlot = TIME_SLOTS[timeIndex];
             const isLastSlot = timeIndex === TIME_SLOTS.length - 1;
+            const isFirstSlot = timeIndex === 0;
 
-            let coveragePool = [...operatorsOnBreak, ...leftoversPool];
-            operatorsOnBreak = []; 
-            leftoversPool = [];
+            const isLocked = lockedColumns[timeIndex];
 
-            if (timeSlot === "08:20") {
-                coveragePool = [...coveragePool, ...standbyOperators];
-                standbyOperators = []; 
-            }
+            if (isLocked) {
+                // Se a coluna estiver bloqueada, apenas lê o que está lá
+                MIP_IDS.forEach((mipId, mipIdx) => {
+                   const assignedSlots = slotMapping[mipId];
+                   if(assignedSlots && assignedSlots.length > 0) {
+                       const cellVal = newMatrix[mipIdx][timeIndex];
+                       if (cellVal && cellVal !== "N/A" && cellVal !== "") {
+                           const names = cellVal.split(" / ");
+                           names.forEach((name, nameIdx) => {
+                               if (nameIdx < assignedSlots.length) {
+                                   const opObj = regularOperators.find(o => o.name === name) || { name: name };
+                                   currentSlotsState[assignedSlots[nameIdx]] = opObj;
+                               }
+                           });
+                       } else {
+                            assignedSlots.forEach(sId => currentSlotsState[sId] = { name: "" });
+                       }
+                   }
+                });
 
-            currentSlotsState = currentSlotsState.map(operatorOnSlot => {
-                if (operatorOnSlot && operatorOnSlot.name !== "" && operatorOnSlot.breakTime === timeSlot && !isLastSlot) {
-                    operatorsOnBreak.push(operatorOnSlot);
-                    return null; 
+                const allocatedNames = new Set(currentSlotsState.filter(s => s && s.name).map(s => s.name));
+                
+                if (isFirstSlot) {
+                    standbyOperators = regularOperators.filter(op => !allocatedNames.has(op.name));
+                    setStandbyOperatorsList(standbyOperators.map(op => op.name).sort());
                 }
-                return operatorOnSlot;
-            });
 
-            coveragePool = shuffleArray(coveragePool);
-
-            currentSlotsState = currentSlotsState.map(slot => {
-                if (slot === null) {
-                    const validIndex = coveragePool.findIndex(op => op.breakTime !== timeSlot);
-                    if (validIndex !== -1) {
-                        const [selectedOp] = coveragePool.splice(validIndex, 1);
-                        return selectedOp;
-                    } else {
-                        return { name: "" }; 
+                const workingNow = currentSlotsState.filter(s => s && s.name && s.name !== "");
+                const nextTimeSlot = TIME_SLOTS[timeIndex + 1];
+                operatorsOnBreak = []; 
+                
+                workingNow.forEach(op => {
+                    if (op.breakTime === nextTimeSlot && !isLastSlot) {
+                        operatorsOnBreak.push(op);
                     }
-                }
-                return slot;
-            });
+                });
 
-            leftoversPool = [...coveragePool];
-            saveSlotsToMatrix(currentSlotsState, timeIndex, finalMatrix, slotMapping);
+                leftoversPool = regularOperators.filter(op => !allocatedNames.has(op.name));
+
+            } else {
+                // SE A COLUNA NÃO ESTÁ BLOQUEADA, VAMOS GERAR
+                // MAS PRECISAMOS RESPEITAR AS LINHAS TRAVADAS (lockedRows)
+                
+                // Conjunto para rastrear quem está nas linhas travadas nesta coluna
+                const lockedRowOperators = new Set();
+                
+                // Pré-preenche o currentSlotsState com dados das linhas travadas
+                MIP_IDS.forEach((mipId, mipIdx) => {
+                    if (lockedRows[mipIdx]) { // SE A LINHA ESTIVER TRAVADA
+                        const assignedSlots = slotMapping[mipId];
+                        if (assignedSlots && assignedSlots.length > 0) {
+                            const cellVal = displayMatrix[mipIdx][timeIndex]; // Pega o valor atual da matriz (que não deve mudar)
+                            if (cellVal && cellVal !== "N/A" && cellVal !== "") {
+                                const names = cellVal.split(" / ");
+                                names.forEach((name, nameIdx) => {
+                                    if (nameIdx < assignedSlots.length) {
+                                        const opObj = regularOperators.find(o => o.name === name) || { name: name };
+                                        currentSlotsState[assignedSlots[nameIdx]] = opObj; // Força no slot
+                                        lockedRowOperators.add(name); // Adiciona na lista de "já usados"
+                                    }
+                                });
+                            } else {
+                                // Se a linha travada estava vazia, força vazio no slot
+                                assignedSlots.forEach(sId => currentSlotsState[sId] = { name: "" });
+                            }
+                        }
+                    }
+                });
+
+                if (isFirstSlot) {
+                    // Filtra os operadores que já estão nas linhas travadas para não serem sorteados
+                    let priorityOperatorsPool = shuffleArray(regularOperators.filter(op => op.isPriority && !lockedRowOperators.has(op.name)));
+                    let regularOperatorsPool = shuffleArray(regularOperators.filter(op => !op.isPriority && !lockedRowOperators.has(op.name)));
+                    
+                    const criticalSlotIndices = new Set();
+                    MIP_IDS.forEach((mipId) => {
+                        if (CRITICAL_MIPS.includes(mipId) && machineConfigs[mipId] > 0) {
+                            slotMapping[mipId].forEach(slotIdx => criticalSlotIndices.add(slotIdx));
+                        }
+                    });
+
+                    // Preenche slots NULL (que não foram preenchidos pelas linhas travadas)
+                    // Primeiro prioridade nos críticos
+                    criticalSlotIndices.forEach(slotIdx => {
+                        if (currentSlotsState[slotIdx] === null && priorityOperatorsPool.length > 0) {
+                            currentSlotsState[slotIdx] = priorityOperatorsPool.shift();
+                        }
+                    });
+
+                    let initialPool = [...priorityOperatorsPool, ...regularOperatorsPool];
+                    currentSlotsState = currentSlotsState.map(slot => {
+                        if (slot === null) {
+                            if (initialPool.length > 0) return initialPool.shift();
+                            return { name: "" }; 
+                        }
+                        return slot;
+                    });
+
+                    standbyOperators = [...initialPool];
+                    setStandbyOperatorsList(standbyOperators.map(op => op.name).sort());
+
+                } else {
+                    let coveragePool = [...operatorsOnBreak, ...leftoversPool];
+                    
+                    // Remove da coveragePool qualquer um que já esteja fixo numa linha travada
+                    coveragePool = coveragePool.filter(op => !lockedRowOperators.has(op.name));
+
+                    operatorsOnBreak = []; 
+                    leftoversPool = [];
+
+                    if (timeSlot === "08:20") {
+                        // Se alguém do standby estava numa linha travada, já foi tratado, então filtra
+                        const availableStandby = standbyOperators.filter(op => !lockedRowOperators.has(op.name));
+                        coveragePool = [...coveragePool, ...availableStandby];
+                        standbyOperators = []; 
+                    }
+
+                    // Processa pausas normalmente para quem não está travado
+                    // Mas se o slot já está ocupado por lockedRow, não mexemos (o map abaixo cuida disso)
+                    currentSlotsState = currentSlotsState.map(operatorOnSlot => {
+                        // Se o operador está num slot que não é null (ou seja, veio do slot anterior OU foi preenchido por linha travada)
+                        if (operatorOnSlot && operatorOnSlot.name !== "") {
+                            // Se foi preenchido por linha travada, não processa pausa "automática" de limpar o slot
+                            // Apenas verifica se é hora de pausa para adicionar à lista de pausa futura, 
+                            // MAS se a linha está travada, teoricamente o operador fica lá. 
+                            // Porém, para manter a lógica: se a linha está travada, o valor É o valor. 
+                            // O operador que sai de pausa vai pro pool.
+                            
+                            // A lógica original removia o operador do slot se fosse hora de pausa.
+                            // Aqui, se a linha está travada, o valor no currentSlotsState JÁ É o valor final.
+                            // Então só processamos a "saída para pausa" se o slot NÃO veio de um travamento (ou seja, veio do tempo anterior).
+                            // Como saber? Verificamos se o slot atual é igual ao que inserimos via travamento.
+                            // Simplificação: Se o slot já está preenchido com o valor da linha travada para ESTE horário, ok.
+                            // Se veio do horário anterior, aplicamos a regra de pausa.
+                            
+                            // A maneira mais segura: O currentSlotsState traz os dados do horário anterior.
+                            // Mas nós JÁ SOBRESCREVEMOS os índices das linhas travadas com os dados deste horário atual no início do bloco else.
+                            // Então, para esses índices, a regra de "sair para o break" não se aplica (pois já definimos quem está lá).
+                            // A regra de sair para o break só se aplica a slots que ainda "trazem" o operador anterior.
+                            
+                            // Como identificar? 
+                            // Podemos verificar se o operador atual está no set lockedRowOperators.
+                            // Se estiver, ele fica (não vira null). Se não estiver, aplicamos a regra da pausa.
+                            
+                            if (lockedRowOperators.has(operatorOnSlot.name)) {
+                                return operatorOnSlot; // Fica fixo
+                            }
+                            
+                            if (operatorOnSlot.breakTime === timeSlot && !isLastSlot) {
+                                operatorsOnBreak.push(operatorOnSlot);
+                                return null; // Sai para o break
+                            }
+                        }
+                        return operatorOnSlot; 
+                    });
+
+                    coveragePool = shuffleArray(coveragePool);
+
+                    currentSlotsState = currentSlotsState.map(slot => {
+                        if (slot === null) {
+                            // Tenta preencher slot vazio com alguém do pool (que não esteja em pausa agora)
+                            const validIndex = coveragePool.findIndex(op => op.breakTime !== timeSlot);
+                            if (validIndex !== -1) {
+                                const [selectedOp] = coveragePool.splice(validIndex, 1);
+                                return selectedOp;
+                            } else {
+                                return { name: "" }; 
+                            }
+                        }
+                        return slot;
+                    });
+
+                    leftoversPool = [...coveragePool];
+                }
+                saveSlotsToMatrix(currentSlotsState, timeIndex, newMatrix, slotMapping);
+            }
         }
         
-        setDisplayMatrix(finalMatrix);
+        setDisplayMatrix(newMatrix);
         setShowConfig(false);
     };
 
@@ -496,7 +632,8 @@ function Escala() {
         MIP_IDS.forEach((mipId, mipArrayIndex) => {
             const assignedSlotIndices = mapping[mipId];
             if (!assignedSlotIndices || assignedSlotIndices.length === 0) {
-                 finalMatrix[mipArrayIndex][timeIndex] = "";
+                 if (machineConfigs[mipId] === 0) finalMatrix[mipArrayIndex][timeIndex] = "N/A";
+                 else finalMatrix[mipArrayIndex][timeIndex] = "";
                  return;
             }
             const operators = assignedSlotIndices.map(slotIdx => slotsState[slotIdx]);
@@ -567,8 +704,6 @@ function Escala() {
         .filter(op => op.name.toLowerCase().includes(searchTerm.toLowerCase()))
         .sort((a,b) => a.name.localeCompare(b.name));
 
-    // --- FUNÇÕES DE GERENCIAMENTO DE OPERADORES ---
-    
     const updateDisplayMatrixAfterDBChange = (newDb) => {
         if (displayMatrix.length === 0) return; 
 
@@ -626,45 +761,70 @@ function Escala() {
         ));
     }
     
-    // --- Renderização do Drawer (Sobrantes) ---
-    const StandbyDrawer = () => (
-        <Drawer
-            anchor="right"
-            open={openStandbyDrawer}
-            onClose={() => setOpenStandbyDrawer(false)}
-        >
-            <Box sx={{ width: 300, p: 2 }}>
-                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-                    <GroupOffIcon sx={{ mr: 1 }} /> Operadores Sobrando ({standbyOperatorsList.length})
-                </Typography>
-                
-                <Alert severity={standbyOperatorsList.length > 0 ? "warning" : "success"} sx={{ mb: 2 }}>
-                    {standbyOperatorsList.length > 0
-                        ? `Estes ${standbyOperatorsList.length} operadores ativos não estão alocados no 05:20.`
-                        : "Todos os operadores ativos estão alocados no slot inicial."
-                    }
-                </Alert>
-                
-                <List dense>
-                    {standbyOperatorsList.map((name, index) => {
-                        const op = db.find(o => o.name === name);
-                        return (
-                            <ListItem key={index}>
-                                <ListItemText 
-                                    primary={
-                                        <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-                                            {name}
-                                            {op?.isPriority && <StarIcon fontSize="small" sx={{ color: 'gold', ml: 0.5 }} />}
-                                        </Box>
-                                    } 
-                                />
-                            </ListItem>
-                        );
-                    })}
-                </List>
-            </Box>
-        </Drawer>
-    );
+    const StandbyDrawer = () => {
+        const currentSlotName = TIME_SLOTS[standbySlotIndex];
+        const currentStandbyList = getStandbyAtSlot(standbySlotIndex);
+
+        return (
+            <Drawer
+                anchor="right"
+                open={openStandbyDrawer}
+                onClose={() => { setOpenStandbyDrawer(false); setStandbySlotIndex(0); }}
+            >
+                <Box sx={{ width: 320, p: 2 }}>
+                    
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, backgroundColor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+                        <IconButton onClick={handlePrevStandbySlot} disabled={standbySlotIndex === 0}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                        
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            {currentSlotName}
+                        </Typography>
+
+                        <IconButton onClick={handleNextStandbySlot} disabled={standbySlotIndex === TIME_SLOTS.length - 1}>
+                            <ChevronRightIcon />
+                        </IconButton>
+                    </Box>
+
+                    <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                        <GroupOffIcon sx={{ mr: 1, fontSize: 20 }} /> 
+                        Sobrando ({currentStandbyList.length})
+                    </Typography>
+                    
+                    <Divider sx={{ mb: 2 }} />
+
+                    <Alert severity={currentStandbyList.length > 0 ? "info" : "success"} sx={{ mb: 2, fontSize: '0.85rem' }}>
+                        {currentStandbyList.length > 0
+                            ? `Lista de operadores ativos não alocados às ${currentSlotName}.`
+                            : `Todos alocados em ${currentSlotName}.`
+                        }
+                    </Alert>
+                    
+                    <List dense>
+                        {currentStandbyList.map((name, index) => {
+                            const op = db.find(o => o.name === name);
+                            const isOnBreak = op?.breakTime === currentSlotName;
+                            
+                            return (
+                                <ListItem key={index} sx={{ backgroundColor: isOnBreak ? '#fff9c4' : 'inherit', borderRadius: 1 }}>
+                                    <ListItemText 
+                                        primary={
+                                            <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
+                                                {name}
+                                                {op?.isPriority && <StarIcon fontSize="small" sx={{ color: 'gold', ml: 0.5 }} />}
+                                                {isOnBreak && <Chip label="Horário de Pausa" size="small" color="warning" variant="outlined" sx={{ ml: 1, height: 20, fontSize: '0.6rem' }} />}
+                                            </Box>
+                                        } 
+                                    />
+                                </ListItem>
+                            );
+                        })}
+                    </List>
+                </Box>
+            </Drawer>
+        );
+    };
 
     return (
         <Paper elevation={2} sx={{ p: 3, m: 2 }}>
@@ -721,13 +881,28 @@ function Escala() {
                 </Stack>
 
                 {displayMatrix.length > 0 && (
-                    <TableContainer component={Paper} variant="outlined" sx={{maxHeight: '700px'}}>
+                    <TableContainer component={Paper} variant="outlined" sx={{maxHeight: '800px'}}>
                         <Table size="small" stickyHeader>
                             <TableHead>
                                 <TableRow>
                                     <TableCell sx={{ backgroundColor: '#e0e0e0', fontWeight: 'bold', width: '10px' }}>MIP</TableCell>
                                     <TableCell align="center" sx={{ backgroundColor: '#e0e0e0', fontWeight: 'bold', width: '10px' }}>Crédito</TableCell>
-                                    {TIME_SLOTS.map(slot => (<TableCell key={slot} align="center" sx={{ backgroundColor: '#e0e0e0', fontWeight: 'bold' }}>{slot}</TableCell>))}
+                                    {TIME_SLOTS.map((slot, index) => (
+                                        <TableCell key={slot} align="center" 
+                                            sx={{ 
+                                                backgroundColor: lockedColumns[index] ? '#b2dfdb' : '#e0e0e0', 
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer',
+                                                userSelect: 'none'
+                                            }}
+                                            onClick={() => toggleColumnLock(index)}
+                                        >
+                                            <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
+                                                <span>{slot}</span>
+                                                {lockedColumns[index] ? <LockIcon fontSize="small" color="action" /> : <LockOpenIcon fontSize="small" color="disabled" sx={{ opacity: 0.5 }} />}
+                                            </Stack>
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -739,10 +914,23 @@ function Escala() {
 
                                     return (
                                     <TableRow key={mip} hover>
-                                        <TableCell component="th" scope="row" sx={{ 
-                                            fontWeight: 'bold', 
-                                            backgroundColor: isCritical ? '#ffe0b2' : '#f5f5f5' 
-                                        }}>{mip}</TableCell>
+                                        <TableCell 
+                                            component="th" 
+                                            scope="row" 
+                                            onClick={() => toggleRowLock(rowIndex)}
+                                            sx={{ 
+                                                fontWeight: 'bold', 
+                                                backgroundColor: lockedRows[rowIndex] ? '#b2dfdb' : (isCritical ? '#ffe0b2' : '#f5f5f5'),
+                                                cursor: 'pointer',
+                                                userSelect: 'none',
+                                                borderRight: '1px solid #ccc'
+                                            }}
+                                        >
+                                            <Stack direction="row" alignItems="center" spacing={1}>
+                                                <span>{mip}</span>
+                                                {lockedRows[rowIndex] ? <LockIcon fontSize="small" sx={{ fontSize: 14, color: '#00796b' }} /> : null}
+                                            </Stack>
+                                        </TableCell>
                                         <TableCell align="center" sx={{ 
                                             backgroundColor: isCritical ? '#ffe0b2' : '#f5f5f5', 
                                             color: 'text.secondary', 
@@ -759,6 +947,9 @@ function Escala() {
                                             const isPriorityOperator = operatorData && db.find(op => op.name === operatorData.name)?.isPriority;
                                             const isCriticalCell = isCritical && colIndex === 0 && isPriorityOperator;
 
+                                            const isRowLocked = lockedRows[rowIndex];
+                                            const isColLocked = lockedColumns[colIndex];
+
                                             return (
                                             <TableCell key={colIndex} align="center" onClick={(event) => handleCellClick(event, rowIndex, colIndex, cellValue)}
                                                 sx={{
@@ -767,7 +958,11 @@ function Escala() {
                                                  cursor: (!isNA) ? 'pointer' : 'default',
                                                  '&:hover': { backgroundColor: (!isNA) ? '#f5f5f5' : undefined },
                                                  fontSize: cellValue.includes('/') ? '0.8rem' : 'inherit',
-                                                 fontWeight: isCriticalCell ? 'bold' : 'normal'
+                                                 fontWeight: isCriticalCell ? 'bold' : 'normal',
+                                                 borderLeft: isColLocked ? '2px solid #b2dfdb' : 'none',
+                                                 borderRight: isColLocked ? '2px solid #b2dfdb' : 'none',
+                                                 borderTop: isRowLocked ? '2px solid #b2dfdb' : undefined,
+                                                 borderBottom: isRowLocked ? '2px solid #b2dfdb' : undefined
                                             }}>
                                                  {isOnBreakSlot && !isNA && !isEmpty ? (
                                                      <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
@@ -811,7 +1006,6 @@ function Escala() {
                     )}
                 </Menu>
 
-                {/* DIÁLOGO DE EDIÇÃO DE SLOT */}
                 <Dialog open={openSwapDialog} onClose={() => setOpenSwapDialog(false)} maxWidth="sm" fullWidth>
                     <DialogTitle>
                         Editar Operadores no Slot
@@ -897,7 +1091,6 @@ function Escala() {
                     </DialogActions>
                 </Dialog>
                 
-                {/* DIÁLOGO DE AVISO DE MULTI-MIP */}
                 <Dialog open={openMultiMIPWarning} onClose={() => setOpenMultiMIPWarning(false)} maxWidth="sm">
                     <DialogTitle sx={{ color: 'error.main', fontWeight: 'bold' }}>
                         🛑 Confirmação de Alocação
@@ -924,7 +1117,6 @@ function Escala() {
                     </DialogActions>
                 </Dialog>
                 
-                {/* --- DIÁLOGO DE GERENCIAMENTO DE OPERADORES --- */}
                 <Dialog open={openManageOperators} onClose={handleCloseManageOperators} maxWidth="lg" fullWidth>
                     <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant="h6" component="span" sx={{ display: 'flex', alignItems: 'center' }}>
@@ -1001,7 +1193,6 @@ function Escala() {
                     </DialogActions>
                 </Dialog>
                 
-                {/* --- Componente Drawer (Lista de Operadores Sobrando) --- */}
                 <StandbyDrawer />
 
             </Box>
