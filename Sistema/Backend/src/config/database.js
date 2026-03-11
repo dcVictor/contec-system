@@ -8,9 +8,10 @@ const pgp = pgPromise();
 const usuario = process.env.DB_USER;
 const senha = process.env.DB_PASSWORD;    
 const port = process.env.DB_PORT; 
+const ip = process.env.DB_HOST;
 const database = process.env.DB_DATABASE ; 
 
-const db = pgp(`postgres://${usuario}:${senha}@192.168.0.121:${port}/${database}`);
+const db = pgp(`postgres://${usuario}:${senha}@192.168.9.127:${port}/${database}`);
 
 db.connect()
   .then(obj => {

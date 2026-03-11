@@ -123,8 +123,8 @@ app.post('/api/abrir-porta', async (req, res, next) => { // Adicionado 'next'
     'catraca2': { ip: '192.168.14.5', user: 'admin', pass: 'Admti89@' },
     'catraca3': { ip: '192.168.14.3', user: 'admin', pass: 'Admti89@' },
     'catraca4': { ip: '192.168.14.6', user: 'admin', pass: 'Admti89@' },
-    'catraca5': { ip: '192.168.16.55', user: 'admin', pass: 'Admti89@' },
-    'catraca6': { ip: '192.168.16.54', user: 'admin', pass: 'Admti89@' },
+    'catraca5': { ip: '192.168.16.55', user: 'admin', pass: 'Admti89#' },
+    'catraca6': { ip: '192.168.16.54', user: 'admin', pass: 'Admti89#' },
     'catraca7': { ip: '192.168.9.150', user: 'admin', pass: 'Admti89@' }
     // Adicione mais dispositivos conforme necessário
   };
@@ -167,7 +167,7 @@ app.use((err, req, res, next) => {
   // Envia uma resposta de erro padronizada
   res.status(err.status || 500).json({ 
     error: {
-      message: err.message || 'Ocorreu um erro interno no servidor.'
+      message: err.message || 'deu ruim.'
     }
   });
 });

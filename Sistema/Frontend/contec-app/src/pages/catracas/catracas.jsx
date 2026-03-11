@@ -1,146 +1,151 @@
-import React from 'react';
-// Stack é usado para organizar os botões lado a lado
-import { Box, Button, Grid } from "@mui/material"; 
-
-
-// Importe sua instância principal do Axios que aponta para o seu backend (http://localhost:3002)
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Typography, Stack, Snackbar, Alert, FormControlLabel, Switch } from "@mui/material"; 
 import api from '../../services/api'; 
-// (Assumindo que você tem um 'services/api.js' que exporta o axios)
 
+function CatracasMonitoramento() {
+  const cameraUrl = "http://192.168.20.13:8889/cam1";
+  
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [manterAberto, setManterAberto] = useState(false); // Estado do modo automático
 
-// ----------------------------------------------------------------------------------
-// Componente React: Catracas (Versão Backend)
-// ----------------------------------------------------------------------------------
-function Catracas() {
-
-  /**
-   * Função que será chamada quando um botão for clicado.
-   * Ela agora é muito mais simples: apenas diz ao backend QUAL catraca abrir.
-   * @param {string} idCatraca - O identificador da catraca (ex: 'catraca1', 'catraca2')
-   */
+  // Função base para abrir a porta
   const abrirPorta = async (idCatraca) => {
     try {
-      console.log(`Enviando solicitação para o backend abrir a ${idCatraca}...`);
-
-      // 1. Faz a chamada POST para o seu backend (server.js)
-      const response = await api.post('/api/abrir-porta', { 
-        idCatraca: idCatraca 
-      });
-
-      // 2. O backend cuida de toda a lógica Digest e retorna o sucesso
-      console.log('Resposta do backend:', response.data.message);
-      alert(`Comando enviado com sucesso para ${idCatraca}!`);
-
+      setError(null);
+      await api.post('/api/abrir-porta', { idCatraca });
+      // Só mostramos o Snackbar se NÃO estiver no modo "Manter Aberto" para não poluir a tela
+      if (!manterAberto) setOpen(true); 
     } catch (error) {
-      // 3. Captura erros (se o backend falhar ou a catraca não for encontrada)
-      const errorMsg = error.response?.data?.message || error.message;
-      console.error(`Falha ao enviar comando para ${idCatraca}:`, errorMsg);
-      alert(`Falha ao abrir a porta: ${errorMsg}`);
+      setError(error.message);
+      setOpen(true);
+      setManterAberto(false); // Desativa o automático se der erro crítico
     }
   };
 
-  // Renderiza o conteúdo visual do componente
-return (
-    <Box sx={{ padding: 3 }}>
-      <h1>Controle de Catracas</h1>
+  // Lógica do Intervalo para o modo "Manter Aberto"
+  useEffect(() => {
+    let intervalo = null;
+
+    if (manterAberto) {
+      // Primeira execução imediata
+      abrirPorta('catraca5');
       
-      {/* Usamos Grid 'container' para envolver os botões.
-        'spacing={2}' adiciona espaçamento entre eles.
-      */}
-      <Grid container spacing={2}>
-        
-        {/* Botão 1: 
-          'item' indica que é um item do grid.
-          'xs={6}' diz para ocupar 6 das 12 colunas (metade da tela), 
-          forçando 2 botões por linha.
-        */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={() => abrirPorta('catraca1')}
-            sx={{ width: '100%' }} // Faz o botão preencher o espaço
-          >
-            Abrir Catraca 1 (192.168.14.7)
-          </Button>
-        </Grid>
+      // Define a repetição a cada 3 segundos
+      intervalo = setInterval(() => {
+        abrirPorta('catraca5');
+      }, 3000);
+    }
 
-        {/* Botão 2: Ocupa os outros 6 espaços da linha */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            onClick={() => abrirPorta('catraca2')}
-            sx={{ width: '100%' }}
-          >
-            Abrir Catraca 2 (192.168.14.5)
-          </Button>
-        </Grid>
+    // Cleanup: Limpa o intervalo se o usuário desativar ou sair da tela
+    return () => {
+      if (intervalo) clearInterval(intervalo);
+    };
+  }, [manterAberto]);
 
-        {/* Botão 3: Pula para a próxima linha */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={() => abrirPorta('catraca3')}
-            sx={{ width: '100%' }}
-          >
-            Abrir Catraca 3 (192.168.14.3)
-          </Button>
-        </Grid>
-        
-        {/* Botão 4: */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="secondary"
-            onClick={() => abrirPorta('catraca4')}
-            sx={{ width: '100%' }}
-          >
-            Abrir Catraca 4 (192.168.14.6)
-          </Button>
-        </Grid>
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setOpen(false);
+  };
 
-        {/* Botão 5: */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={() => abrirPorta('catraca5')}
-            sx={{ width: '100%' }}
-          >
-            Abrir Catraca (192.168.16.55)
-          </Button>
-        </Grid>
+  return (
+    <Box sx={{ display: 'flex', width: '100vw', height: '100vh', backgroundColor: '#000', overflow: 'hidden' }}>
+      
+      {/* 1. LADO ESQUERDO: Vídeo da Câmera */}
+      <Box sx={{ flex: 1, position: 'relative', backgroundColor: '#111' }}>
+        <iframe 
+          src={`${cameraUrl}?autoplay=true&muted=true`}
+          style={{ width: '100%', height: '100%', border: 'none', pointerEvents: 'none' }}
+          title="Monitoramento Intelbras"
+        />
+        {/* Badge Visual de modo automático */}
+        {manterAberto && (
+          <Box sx={{ position: 'absolute', top: 20, left: 20, backgroundColor: 'rgba(255,0,0,0.7)', color: '#fff', padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold', animation: 'pulse 1.5s infinite' }}>
+            ● MODO MANTER ABERTO ATIVO
+          </Box>
+        )}
+      </Box>
 
-        {/* Botão 6: */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            onClick={() => abrirPorta('catraca6')}
-            sx={{ width: '100%' }}
-          >
-            Abrir Catraca (192.168.16.54)
-          </Button>
+      {/* 2. LADO DIREITO: Painel de Controle */}
+      <Box sx={{ width: '350px', backgroundColor: '#1a1a1a', borderLeft: '2px solid #333', padding: 4, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <Stack spacing={4} sx={{ width: '100%' }}>
+          
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ color: '#fff', fontWeight: 'bold', mb: 1 }}>PORTARIA</Typography>
+            <Typography variant="subtitle1" sx={{ color: '#aaa', textTransform: 'uppercase' }}>Catraca Entrada - Matriz</Typography>
+          </Box>
 
-        </Grid>
-         {/* Botão 7: */}
-        <Grid item xs={6}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={() => abrirPorta('catraca7')}
-            sx={{ width: '100%' }}
-          >
-            Abrir teste (192.168.9.150)
-          </Button>
-        </Grid>
+          <Box sx={{ borderBottom: '1px solid #333', width: '100%' }} />
 
-      </Grid>
+          <Stack spacing={2} alignItems="center">
+            <Button 
+              variant="contained" 
+              disabled={manterAberto} 
+              onClick={() => abrirPorta('catraca5')}
+              sx={{ 
+                height: '120px', 
+                width: '100%',
+                fontSize: '1.4rem', 
+                color: '#fff',
+                backgroundColor: manterAberto ? '#afacacef' : '#1976d2',
+                fontWeight: 'bold',
+                borderRadius: '12px',
+                transition: 'all 0.2s'
+                
+              }}
+            >
+              {manterAberto ? 'PORTA ABERTA' : 'LIBERAR ENTRADA'}
+            </Button>
+
+            {/* Opção Manter Aberto */}
+            <FormControlLabel
+              control={
+                <Switch 
+                  checked={manterAberto} 
+                  onChange={(e) => setManterAberto(e.target.checked)} 
+                  color="error"
+                />
+              }
+              label={
+                <Typography sx={{ color: '#fff', fontWeight: 'bold' }}>
+                  MANTER ABERTO
+                </Typography>
+              }
+              sx={{ 
+                backgroundColor: manterAberto ? 'rgba(211, 47, 47, 0.1)' : 'transparent',
+                padding: '5px 15px',
+                borderRadius: '8px',
+                width: '100%',
+                justifyContent: 'center',
+                margin: 0
+              }}
+            />
+          </Stack>
+
+          <Typography variant="caption" sx={{ color: '#666', textAlign: 'center' }}>
+            Sistema de Segurança - Zagonel
+          </Typography>
+        </Stack>
+      </Box>
+
+      {/* NOTIFICAÇÃO */}
+      <Snackbar open={open} autoHideDuration={4000} onClose={handleClose} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+        <Alert onClose={handleClose} severity={error ? "error" : "success"} variant="filled" sx={{ width: '100%' }}>
+          {error ? `Erro: ${error}` : "Catraca Liberada!"}
+        </Alert>
+      </Snackbar>
+
+      <style>
+        {`
+          @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
     </Box>
   );
 }
 
-export default Catracas;
-
+export default CatracasMonitoramento;
